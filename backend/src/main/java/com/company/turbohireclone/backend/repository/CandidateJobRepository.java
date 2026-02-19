@@ -1,0 +1,23 @@
+package com.company.turbohireclone.backend.repository;
+
+import com.company.turbohireclone.backend.entity.CandidateJob;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface CandidateJobRepository extends JpaRepository<CandidateJob, Long> {
+
+    // READ for frontend
+    List<CandidateJob> findByCandidate_Id(Long candidateId);
+
+    List<CandidateJob> findByJob_Id(Long jobId);
+
+    List<CandidateJob> findByCurrentStageAndStatus(
+            String currentStage,
+            String status
+    );
+
+    List<CandidateJob> findByStatus(String status);
+}
