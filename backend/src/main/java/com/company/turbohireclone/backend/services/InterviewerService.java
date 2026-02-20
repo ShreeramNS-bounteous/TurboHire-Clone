@@ -5,9 +5,7 @@ import com.company.turbohireclone.backend.dto.HR.HrSlotDto;
 import com.company.turbohireclone.backend.dto.interviewer.InterviewerNavbarDto;
 import com.company.turbohireclone.backend.dto.interviewer.MyInterviewDto;
 import com.company.turbohireclone.backend.entity.*;
-import com.company.turbohireclone.backend.entity.*;
 import com.company.turbohireclone.backend.enums.SlotStatus;
-import com.company.turbohireclone.backend.repository.*;
 import com.company.turbohireclone.backend.repository.*;
 import com.company.turbohireclone.backend.security.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -188,7 +186,8 @@ public class InterviewerService {
     public List<HrInterviewerAvailabilityDto> getAvailableInterviewersForHr(
             LocalDate date,
             LocalTime from,
-            LocalTime to
+            LocalTime to,
+            String expertise
     ) {
 
         List<InterviewerSlot> slots =
@@ -198,6 +197,21 @@ public class InterviewerService {
                         to,
                         from
                 );
+
+        if (slots.isEmpty()) {
+            return List.of();
+        }
+
+        // 🔥 1️⃣ REMOVE EXPIRED SLOTS
+        LocalDate today = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+
+        slots = slots.stream()
+                .filter(slot -> {
+                    if (!slot.getSlotDate().isEqual(today)) return true;
+                    return slot.getStartTime().isAfter(nowTime);
+                })
+                .toList();
 
         if (slots.isEmpty()) {
             return List.of();
@@ -213,37 +227,48 @@ public class InterviewerService {
                         .stream()
                         .collect(Collectors.toMap(User::getId, u -> u));
 
-
         Map<Long, InterviewerProfile> profileMap =
                 profileRepository.findByUserIdIn(userIds)
                         .stream()
                         .collect(Collectors.toMap(InterviewerProfile::getUserId, p -> p));
 
-        return slotsByUser.entrySet().stream().map(entry -> {
-            Long userId = entry.getKey();
-            InterviewerProfile profile = profileMap.get(userId);
-            User user = userMap.get(userId);
+        return slotsByUser.entrySet().stream()
 
-            return HrInterviewerAvailabilityDto.builder()
-                    .userId(userId)
-                    .userName(user != null ? user.getFullName() : "Employee")
-                    .expertise(profile != null ? profile.getExpertise() : null)
-                    .experienceYears(
-                            profile != null ? profile.getExperienceYears() : null
-                    )
-                    .slots(
-                            entry.getValue().stream()
-                                    .map(slot -> HrSlotDto.builder()
-                                            .slotId(slot.getId())
-                                            .startTime(slot.getStartTime())
-                                            .endTime(slot.getEndTime())
-                                            .slotStatus(slot.getStatus())
-                                            .build())
-                                    .toList()
-                    )
-                    .build();
-        }).toList();
+                // 🔥 2️⃣ FILTER BY EXPERTISE (OPTIONAL)
+                .filter(entry -> {
+                    if (expertise == null || expertise.isBlank()) return true;
 
+                    InterviewerProfile profile = profileMap.get(entry.getKey());
+                    return profile != null &&
+                            profile.getExpertise() != null &&
+                            profile.getExpertise().equalsIgnoreCase(expertise);
+                })
+
+                .map(entry -> {
+                    Long userId = entry.getKey();
+                    InterviewerProfile profile = profileMap.get(userId);
+                    User user = userMap.get(userId);
+
+                    return HrInterviewerAvailabilityDto.builder()
+                            .userId(userId)
+                            .userName(user != null ? user.getFullName() : "Employee")
+                            .expertise(profile != null ? profile.getExpertise() : null)
+                            .experienceYears(
+                                    profile != null ? profile.getExperienceYears() : null
+                            )
+                            .slots(
+                                    entry.getValue().stream()
+                                            .map(slot -> HrSlotDto.builder()
+                                                    .slotId(slot.getId())
+                                                    .startTime(slot.getStartTime())
+                                                    .endTime(slot.getEndTime())
+                                                    .slotStatus(slot.getStatus())
+                                                    .build())
+                                            .toList()
+                            )
+                            .build();
+                })
+                .toList();
     }
 
     private MyInterviewDto mapToDto(Interview interview) {

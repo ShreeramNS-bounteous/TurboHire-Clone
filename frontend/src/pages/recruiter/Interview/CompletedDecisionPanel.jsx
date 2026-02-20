@@ -87,6 +87,7 @@ export default function CompletedDecisionPanel({
     }
   };
  
+  console.log(interview)
   return (
     <div className="decision-wrapper">
       {/* ========================= HEADER ========================= */}
@@ -155,10 +156,6 @@ export default function CompletedDecisionPanel({
               <span className="badge recommend">
                 {interview.recommendation}
               </span>
-            </div>
- 
-            <div className="comments">
-              {interview.comments || "No additional comments."}
             </div>
           </>
         )}
