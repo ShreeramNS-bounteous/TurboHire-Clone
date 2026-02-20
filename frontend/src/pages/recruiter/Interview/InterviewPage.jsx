@@ -8,7 +8,6 @@ import BookSlotModal from "./BookSlotModal";
 import CompletedInterviewList from "./CompletedInterviewList";
 import { useParams } from "react-router-dom";
 
-
 import { fetchAvailableInterviewers } from "../../../api/interviewer.api";
 import {
   bookInterviewSlot,
@@ -31,18 +30,30 @@ export default function InterviewPage() {
   const [scheduledInterviews, setScheduledInterviews] = useState([]);
   const [completedInterviews, setCompletedInterviews] = useState([]);
 
+  const getNowDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  
+
+  const getNowTime = () => {
+    return new Date().toTimeString().slice(0, 5);
+  };
+
   const [filters, setFilters] = useState({
-    date: "2026-02-10",
-    from: "10:00",
-    to: "13:00",
+    date: getNowDate(),
+    from: getNowTime(),
+    to: "18:00",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
   const { jobId } = useParams();
-
-
 
   // =====================================
   // LOAD DATA BASED ON TAB
@@ -51,16 +62,15 @@ export default function InterviewPage() {
     if (activeTab === "PENDING") {
       fetchPendingInterviews(jobId).then(setPendingInterviews);
     }
-  
+
     if (activeTab === "SCHEDULED") {
       fetchScheduledInterviews(jobId).then(setScheduledInterviews);
     }
-  
+
     if (activeTab === "COMPLETED") {
       fetchCompletedInterviews(jobId).then(setCompletedInterviews);
     }
   }, [activeTab, jobId]);
-  
 
   // =====================================
   // SCHEDULE CLICK (NO INTERVIEW CREATED YET)
@@ -102,14 +112,13 @@ export default function InterviewPage() {
         interviewerSlotId: slotId,
         meetingUrl,
       });
-      
-      toast.success("Interview scheduled sucessfully")
+
+      toast.success("Interview scheduled sucessfully");
       setIsModalOpen(false);
       setSelectedInterview(null);
 
       const data = await fetchPendingInterviews(jobId);
-setPendingInterviews(data);
-
+      setPendingInterviews(data);
     } catch (err) {
       toast.error("Error booking slot", err);
     }
@@ -123,6 +132,8 @@ setPendingInterviews(data);
       handleSearch(filters);
     }
   }, [selectedInterview]);
+
+  console.log(selectedInterview)
 
   return (
     <div className="interview-page">
@@ -160,7 +171,11 @@ setPendingInterviews(data);
             <div className="availability-view">
               {selectedInterview && (
                 <div className="interview-layout">
-                  <FiltersPanel filters={filters} onSearch={handleSearch} />
+                  <FiltersPanel
+                    filters={filters}
+                    onSearch={handleSearch}
+                    getNowDate={getNowDate}
+                  />
 
                   <div className="interview-content">
                     <div className="content-header">
@@ -212,7 +227,6 @@ setPendingInterviews(data);
             onActionComplete={async () => {
               const updatedCompleted = await fetchCompletedInterviews(jobId);
               const updatedPending = await fetchPendingInterviews(jobId);
-            
 
               setCompletedInterviews(updatedCompleted);
               setPendingInterviews(updatedPending);

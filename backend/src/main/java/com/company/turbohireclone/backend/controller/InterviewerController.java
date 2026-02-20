@@ -108,10 +108,11 @@ public class InterviewerController {
     public ResponseEntity<List<HrInterviewerAvailabilityDto>> getInterviewerAvailability(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime to
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime to,
+            @RequestParam(required = false) String expertise
     ) {
         return ResponseEntity.ok(
-                interviewerService.getAvailableInterviewersForHr(date, from, to)
+                interviewerService.getAvailableInterviewersForHr(date, from, to,expertise)
         );
     }
 

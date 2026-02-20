@@ -17,9 +17,9 @@ export const deleteAvailabilitySlot = async (slotId) => {
   await api.delete(`/api/interviewers/slots/${slotId}`);
 };
 
-export const fetchAvailableInterviewers = ({ date, from, to }) => {
+export const fetchAvailableInterviewers = ({ date, from, to, expertise }) => {
   return api.get("/api/interviewers/availability", {
-    params: { date, from, to }
+    params: { date:date, from:from, to:to,expertise: expertise|| undefined }
   });
 };
 

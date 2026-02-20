@@ -6,7 +6,6 @@ export default function InterviewerCard({ interviewer, onBook }) {
     <div className="interviewer-card">
       <div className="card-header">
         <div className="avatar">👤</div>
-        {console.log(interviewer)}
 
         <div>
           <h4>{interviewer.userName}</h4>
