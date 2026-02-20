@@ -1,6 +1,7 @@
 import SlotRow from "./SlotRow";
 
-export default function InterviewerCard({ interviewer,onBook }) {
+export default function InterviewerCard({ interviewer, onBook }) {
+  console.log(interviewer)
   return (
     <div className="interviewer-card">
       <div className="card-header">

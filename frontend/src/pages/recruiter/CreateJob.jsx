@@ -18,9 +18,13 @@ export default function CreateJob() {
     buId: "",
   });
 
-  // 🔹 ROUNDS STATE
+  // 🔥 UPDATED ROUNDS STATE
   const [rounds, setRounds] = useState([
-    { roundName: "", roundOrder: 1 },
+    {
+      roundName: "",
+      roundOrder: 1,
+      evaluationTemplateCode: "TECH_BASIC",
+    },
   ]);
 
   useEffect(() => {
@@ -54,16 +58,16 @@ export default function CreateJob() {
 
       const jobId = jobRes.data.id;
 
-      // 2️⃣ CREATE ROUNDS (THIS WAS MISSING ❌)
+      // 2️⃣ CREATE ROUNDS
       await Promise.all(
         rounds
           .filter((r) => r.roundName.trim())
           .map((r, index) =>
-          api.post(`/api/jobs/${jobId}/rounds`, {
-            roundName: r.roundName,
-            roundOrder: index + 1,
-            evaluationTemplateCode: r.evaluationTemplateCode,
-          })
+            api.post(`/api/jobs/${jobId}/rounds`, {
+              roundName: r.roundName,
+              roundOrder: index + 1,
+              evaluationTemplateCode: r.evaluationTemplateCode,
+            })
           )
       );
 
@@ -137,12 +141,14 @@ export default function CreateJob() {
           />
         </div>
 
-        {/* Interview Rounds */}
+        {/* ================= INTERVIEW ROUNDS ================= */}
         <div className="mb-6">
           <p className="font-medium mb-2">Interview Rounds</p>
 
           {rounds.map((r, index) => (
-            <div key={index} className="flex gap-3 mb-2">
+            <div key={index} className="flex gap-3 mb-3 items-center">
+              
+              {/* Round Name */}
               <input
                 placeholder={`Round ${index + 1}`}
                 value={r.roundName}
@@ -154,6 +160,23 @@ export default function CreateJob() {
                 className="flex-1 border p-2 rounded"
               />
 
+              {/* 🔥 Template Selector */}
+              <select
+                value={r.evaluationTemplateCode}
+                onChange={(e) => {
+                  const copy = [...rounds];
+                  copy[index].evaluationTemplateCode = e.target.value;
+                  setRounds(copy);
+                }}
+                className="border p-2 rounded"
+              >
+                <option value="TECH_BASIC">Technical Core</option>
+                <option value="TECH_ADVANCE">Technical ADVANCE</option>
+                <option value="HR">HR Round</option>
+                <option value="MANAGERIAL">Managerial</option>
+              </select>
+
+              {/* Remove */}
               {rounds.length > 1 && (
                 <button
                   type="button"
@@ -168,12 +191,17 @@ export default function CreateJob() {
             </div>
           ))}
 
+          {/* Add Round */}
           <button
             type="button"
             onClick={() =>
               setRounds([
                 ...rounds,
-                { roundName: "", roundOrder: rounds.length + 1 },
+                {
+                  roundName: "",
+                  roundOrder: rounds.length + 1,
+                  evaluationTemplateCode: "TECH_BASIC",
+                },
               ])
             }
             className="text-blue-600 text-sm mt-2"
@@ -182,7 +210,7 @@ export default function CreateJob() {
           </button>
         </div>
 
-        {/* Actions */}
+        {/* ================= ACTIONS ================= */}
         <div className="flex gap-4">
           <button
             type="submit"

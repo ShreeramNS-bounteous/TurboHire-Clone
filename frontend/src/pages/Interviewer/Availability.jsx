@@ -5,6 +5,7 @@ import {
   deleteAvailabilitySlot,
 } from "../../api/interviewer.api";
 import { useAuth } from "../../auth/AuthContext";
+import toast from "react-hot-toast";
 
 export default function Availability() {
   const { user } = useAuth();
@@ -57,23 +58,65 @@ export default function Availability() {
   };
 
   /* ==============================
-     ADD SLOT
+     ADD SLOT (FULL VALIDATION)
   =============================== */
   const handleAddSlot = async (e) => {
     e.preventDefault();
 
     if (!userId) {
-      alert("User not loaded yet. Please refresh.");
+      toast.error("User not loaded yet. Please refresh.");
       return;
     }
 
     if (!form.date || !form.startTime || !form.endTime) {
-      alert("All fields are required");
+      toast.error("All fields are required");
       return;
     }
 
     if (form.startTime >= form.endTime) {
-      alert("End time must be after start time");
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    const now = new Date();
+    const newStart = new Date(`${form.date}T${form.startTime}`);
+    const newEnd = new Date(`${form.date}T${form.endTime}`);
+
+    // ❌ Prevent past slot
+    if (newStart < now) {
+      toast.error("Cannot add slot in the past");
+      return;
+    }
+
+    // ❌ Prevent duplicate slot
+    const duplicate = slots.some(
+      (slot) =>
+        slot.slotDate === form.date &&
+        slot.startTime === form.startTime &&
+        slot.endTime === form.endTime
+    );
+
+    if (duplicate) {
+      toast.error("This exact slot already exists");
+      return;
+    }
+
+    // ❌ Prevent overlapping slot
+    const overlapping = slots.some((slot) => {
+      if (slot.slotDate !== form.date) return false;
+
+      const existingStart = new Date(
+        `${slot.slotDate}T${slot.startTime}`
+      );
+      const existingEnd = new Date(
+        `${slot.slotDate}T${slot.endTime}`
+      );
+
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+
+    if (overlapping) {
+      toast.error("This slot overlaps with an existing slot");
       return;
     }
 
@@ -86,10 +129,12 @@ export default function Availability() {
         endTime: form.endTime,
       });
 
+      toast.success("Slot added successfully");
+
       setForm({ date: "", startTime: "", endTime: "" });
       loadSlots();
     } catch (err) {
-      alert("Failed to add slot");
+      toast.error("Failed to add slot");
     } finally {
       setSaving(false);
     }
@@ -104,6 +149,7 @@ export default function Availability() {
     if (!window.confirm("Delete this slot?")) return;
 
     await deleteAvailabilitySlot(slotId, userId);
+    toast.success("Slot deleted");
     loadSlots();
   };
 
@@ -112,9 +158,16 @@ export default function Availability() {
   =============================== */
   const activeSlots = slots.filter((slot) => !isSlotExpired(slot));
 
+  const today = new Date().toISOString().split("T")[0];
+
+  const getMinStartTime = () => {
+    if (form.date !== today) return "";
+    const now = new Date();
+    return now.toTimeString().slice(0, 5);
+  };
+
   return (
-    <div className="px-12 py-10 bg-[#F9FAFB] min-h-screen font-['Montserrat']">
-      
+    <div className="md:px-12 py-10  min-h-screen font-['Montserrat']">
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#101828]">
@@ -136,6 +189,7 @@ export default function Availability() {
             <input
               type="date"
               name="date"
+              min={today}
               value={form.date}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -144,6 +198,7 @@ export default function Availability() {
             <input
               type="time"
               name="startTime"
+              min={getMinStartTime()}
               value={form.startTime}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -191,9 +246,7 @@ export default function Availability() {
             <div
               key={slot.id}
               className={`flex justify-between items-center p-5 border border-gray-100 rounded-xl transition-all ${
-                slot.booked
-                  ? "bg-gray-50"
-                  : "hover:shadow-md"
+                slot.booked ? "bg-gray-50" : "hover:shadow-md"
               }`}
             >
               <div>
@@ -222,7 +275,7 @@ export default function Availability() {
                     : "text-red-500 hover:text-red-600"
                 }`}
               >
-                Delete
+                {!slot.booked ? "Delete" : "Booked"}
               </button>
             </div>
           ))}

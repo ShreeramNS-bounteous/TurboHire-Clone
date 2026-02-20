@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
+import InterviewerNavbar from "../../components/InterviewerNavbar";
 import InterviewerTabs from "./InterviewerTabs";
 import Availability from "./Availability";
 import ScheduledTab from "./ScheduledTab";
@@ -93,7 +93,7 @@ export default function InterviewerDashboard() {
 
   return (
     <>
-      <Navbar interviewer={interviewer} onOpenFilters={() => {}} />
+      <InterviewerNavbar interviewer={interviewer} onOpenFilters={() => {}} />
 
       <InterviewerTabs
         activeTab={activeTab}
