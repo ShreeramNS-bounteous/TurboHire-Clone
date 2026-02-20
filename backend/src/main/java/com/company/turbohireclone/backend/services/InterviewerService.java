@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,13 +104,50 @@ public class InterviewerService {
 
 
     // -------- AVAILABILITY --------
-
     public InterviewerSlot addSlot(
             Long userId,
             LocalDate slotDate,
             LocalTime startTime,
             LocalTime endTime
     ) {
+
+        // 1️⃣ Validate time order
+        if (!startTime.isBefore(endTime)) {
+            throw new RuntimeException("End time must be after start time");
+        }
+
+        // 2️⃣ Prevent past slot
+        LocalDateTime slotStartDateTime = LocalDateTime.of(slotDate, startTime);
+        if (slotStartDateTime.isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Cannot create slot in the past");
+        }
+
+        // 3️⃣ Prevent duplicate slot
+        boolean duplicateExists = slotRepository
+                .existsByUserIdAndSlotDateAndStartTimeAndEndTime(
+                        userId, slotDate, startTime, endTime
+                );
+
+        if (duplicateExists) {
+            throw new RuntimeException("This exact slot already exists");
+        }
+
+        // 4️⃣ Prevent overlapping slot
+        List<InterviewerSlot> sameDaySlots =
+                slotRepository.findByUserIdAndSlotDate(userId, slotDate);
+
+        for (InterviewerSlot existing : sameDaySlots) {
+
+            boolean overlap =
+                    startTime.isBefore(existing.getEndTime()) &&
+                            endTime.isAfter(existing.getStartTime());
+
+            if (overlap) {
+                throw new RuntimeException("This slot overlaps with an existing slot");
+            }
+        }
+
+        // 5️⃣ Save slot
         InterviewerSlot slot = InterviewerSlot.builder()
                 .userId(userId)
                 .slotDate(slotDate)
@@ -199,6 +237,7 @@ public class InterviewerService {
                                             .slotId(slot.getId())
                                             .startTime(slot.getStartTime())
                                             .endTime(slot.getEndTime())
+                                            .slotStatus(slot.getStatus())
                                             .build())
                                     .toList()
                     )
@@ -260,6 +299,7 @@ public class InterviewerService {
                 .jobTitle(interview.getCandidateJob().getJob().getTitle())
                 .jobId(interview.getCandidateJob().getJob().getId())
                 .roundName(interview.getRound().getRoundName())
+                .evaluationTemplateCode(currentRound.getEvaluationTemplateCode())
                 .evaluationTemplateCode(templateCode)
                 .hasNextRound(hasNextRound)
                 .slotDate(slotDate)

@@ -27,4 +27,17 @@ public interface InterviewerSlotRepository extends JpaRepository<InterviewerSlot
     List<InterviewerSlot> findByUserId(Long userId);
 
     List<InterviewerSlot> findByUserIdAndStatus(Long userId, SlotStatus status);
+
+    boolean existsByUserIdAndSlotDateAndStartTimeAndEndTime(
+            Long userId,
+            LocalDate slotDate,
+            LocalTime startTime,
+            LocalTime endTime
+    );
+
+    List<InterviewerSlot> findByUserIdAndSlotDate(
+            Long userId,
+            LocalDate slotDate
+    );
+
 }

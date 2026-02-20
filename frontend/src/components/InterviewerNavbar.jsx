@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Filter, LogOut, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ interviewer, onOpenFilters }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -14,29 +15,30 @@ const Navbar = ({ interviewer, onOpenFilters }) => {
     .substring(0, 2)
     .toUpperCase();
 
+  const navigate = useNavigate();
+
+  const goToAbout = () => {
+    navigate("/interviewer"); // Navigate to /about page
+  };
+
   return (
     <div className="h-16 bg-[#101828] text-white flex items-center justify-between px-8 shrink-0 shadow-lg z-50">
-      
       {/* LEFT LOGO */}
-      <div className="flex items-center gap-3">
-        <div className="h-8 w-8 bg-[#007bff] rounded flex items-center justify-center font-bold">
-          T
+      <div className="flex items-center gap-3 cursor-pointer"  onClick={goToAbout}>
+        <div
+          className="w-10 h-10 bg-black rounded-md flex items-center justify-center relative overflow-hidden shadow-md shadow-gray-700 group-hover:shadow-md transition-all">
+          <div className="absolute inset-0 bg-gray-900 group-hover:bg-black transition-colors"></div>
+          <span className="relative z-10 text-[#008AFF] font-bold text-xl mr-[1px]">
+            T
+          </span>
+          <span className="relative z-10 text-white font-bold text-xl">H</span>
         </div>
-        <span className="font-bold tracking-tight text-lg">
-          TurboHire
-        </span>
+        <span className="font-bold tracking-tight text-lg">TurboHire</span>
       </div>
 
       {/* RIGHT SIDE */}
       <div className="flex items-center gap-6">
-
-        <button
-          onClick={onOpenFilters}
-          className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all font-bold text-sm"
-        >
-          <Filter size={16} /> Filters
-        </button>
-
+    
         <div className="relative">
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -47,9 +49,7 @@ const Navbar = ({ interviewer, onOpenFilters }) => {
             </div>
 
             <div className="text-left hidden md:block">
-              <p className="text-xs font-bold leading-none">
-                {fullName}
-              </p>
+              <p className="text-xs font-bold leading-none">{fullName}</p>
               <p className="text-[10px] text-gray-400 font-medium mt-1">
                 Interviewer
               </p>
@@ -65,11 +65,8 @@ const Navbar = ({ interviewer, onOpenFilters }) => {
 
           {isProfileOpen && (
             <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 text-[#101828]">
-              
               <div className="px-4 py-3 border-b border-gray-50">
-                <p className="text-sm font-bold truncate">
-                  {email}
-                </p>
+                <p className="text-sm font-bold truncate">{email}</p>
               </div>
 
               <button
@@ -81,7 +78,6 @@ const Navbar = ({ interviewer, onOpenFilters }) => {
               >
                 <LogOut size={16} /> Sign Out
               </button>
-
             </div>
           )}
         </div>

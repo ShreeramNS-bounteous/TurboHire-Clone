@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import { useParams, useNavigate } from "react-router-dom";
+import InterviewerNavbar from "../../components/InterviewerNavbar";
 import CandidateCard from "../../components/CandidateCard";
 import EvaluationModel from "../../components/EvaluationModel";
+import { ArrowLeft } from "lucide-react";
 
 import {
   getPreviousRoundFeedback,
@@ -16,6 +17,7 @@ import toast from "react-hot-toast";
 
 export default function InterviewDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [interview, setInterview] = useState(null);
   const [previousFeedback, setPreviousFeedback] = useState([]);
@@ -23,7 +25,6 @@ export default function InterviewDetailPage() {
 
   const [isEvaluationOpen, setIsEvaluationOpen] = useState(false);
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
-
   const [timeLabel, setTimeLabel] = useState("");
 
   /* ================= LOAD PROFILE ================= */
@@ -42,8 +43,7 @@ export default function InterviewDetailPage() {
   /* ================= LOAD INTERVIEW ================= */
   const loadInterview = async () => {
     try {
-      const all = await getMyInterviews(); // ✅ FIXED
-
+      const all = await getMyInterviews();
       const found = all.find((i) => String(i.interviewId) === String(id));
 
       if (!found) {
@@ -63,7 +63,6 @@ export default function InterviewDetailPage() {
 
   /* ================= LOAD PREVIOUS FEEDBACK ================= */
   const loadFeedback = async () => {
-    // ✅ MOVED OUTSIDE
     try {
       const data = await getPreviousRoundFeedback(id);
       setPreviousFeedback(data || []);
@@ -75,8 +74,9 @@ export default function InterviewDetailPage() {
   useEffect(() => {
     if (id) loadFeedback();
   }, [id]);
+  
 
-  /* ================= TIMER ================= */
+  /* ================= TIMER LOGIC ================= */
   useEffect(() => {
     if (!interview) return;
 
@@ -85,28 +85,21 @@ export default function InterviewDetailPage() {
         `${interview.slotDate}T${interview.startTime}`
       );
 
-      const now = new Date();
-      const diff = startTime - now;
+      const endTime = new Date(`${interview.slotDate}T${interview.endTime}`);
+
 
       if (interview.attendanceStatus === "NO_SHOW") {
         setTimeLabel("No Show");
         return;
       }
 
-      if (
-        interview.attendanceStatus === "ATTENDED" &&
-        !interview.feedbackSubmitted
-      ) {
-        setTimeLabel("Pending Decision");
-        return;
-      }
-
-      if (interview.feedbackSubmitted ) {
+      if (interview.feedbackSubmitted) {
         setTimeLabel("Completed");
         return;
       }
 
-      if (diff > 0) {
+      if (now < startTime) {
+        const diff = startTime - now;
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
@@ -115,8 +108,27 @@ export default function InterviewDetailPage() {
         } else {
           setTimeLabel(`Starts in ${minutes}m`);
         }
-      } else {
+        return;
+      }
+
+      if (now >= startTime && now <= endTime) {
         setTimeLabel("Interview in progress");
+        return;
+      }
+
+      if (now > endTime) {
+        if (!interview.attendanceStatus) {
+          setTimeLabel("Awaiting Attendance");
+          return;
+        }
+
+        if (
+          interview.attendanceStatus === "ATTENDED" &&
+          !interview.feedbackSubmitted
+        ) {
+          setTimeLabel("Decision Pending");
+          return;
+        }
       }
     }, 500);
 
@@ -141,9 +153,8 @@ export default function InterviewDetailPage() {
       await submitInterviewFeedback(id, payload);
       toast.success("Feedback submitted");
       setIsEvaluationOpen(false);
-
-      await loadInterview(); // refresh interview
-      await loadFeedback(); // refresh previous feedback
+      await loadInterview();
+      await loadFeedback();
     } catch {
       toast.error("Feedback submission failed");
     }
@@ -155,20 +166,49 @@ export default function InterviewDetailPage() {
     `${interview.slotDate}T${interview.startTime}`
   );
 
-  const canMarkAttendance =
-    new Date() >= interviewStart && !interview.attendanceStatus;
+  const endTime = new Date(
+    `${interview.slotDate}T${interview.endTime}`
+  );
+  const now = new Date();
 
   const canEvaluate =
-    interview.attendanceStatus === "ATTENDED" && !interview.feedbackSubmitted;
+    now >= endTime &&
+    interview.attendanceStatus === "ATTENDED" 
+
+  const canMarkAttendance =
+    new Date() >= interviewStart && !interview.attendanceStatus;
+  
+  
+
+  
 
   return (
     <>
-      <Navbar interviewer={interviewer} />
+      <InterviewerNavbar interviewer={interviewer} />
 
-      <div className="px-12 py-10 bg-[#F9FAFB] min-h-screen">
+      <div className="px-4 sm:px-6 md:px-12 py-8 md:py-10 bg-[#F9FAFB] min-h-screen">
+        {/* ================= BACK BUTTON ================= */}
+        <div className="mb-6 flex">
+          <button
+            onClick={() => navigate(-1)}
+            className="group flex items-center gap-2 px-4 py-2 rounded-2xl
+                       bg-white border border-gray-200 shadow-sm
+                       text-sm font-semibold text-gray-700
+                       hover:shadow-md hover:-translate-y-0.5
+                       transition-all duration-200 w-fit"
+          >
+            <ArrowLeft
+              size={18}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            Back to Interviews
+          </button>
+        </div>
+
         {/* ================= HEADER ================= */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8">
-          <div className="grid grid-cols-3 items-center">
+        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start md:items-center">
+            {/* LEFT */}
             <div>
               <h1 className="text-2xl font-bold text-[#101828]">
                 {interview.jobTitle}
@@ -185,19 +225,21 @@ export default function InterviewDetailPage() {
               </p>
             </div>
 
-            <div className="flex justify-center">
+            {/* CENTER STATUS */}
+            <div className="flex justify-start md:justify-center">
               <span className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-semibold">
                 {timeLabel}
               </span>
             </div>
 
-            <div className="flex flex-col items-end gap-3">
+            {/* RIGHT ACTIONS */}
+            <div className="flex flex-col gap-3 w-full md:w-[320px] md:items-end">
               {interview.status === "SCHEDULED" && (
                 <a
                   href={interview.meetingUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition"
+                  className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition"
                 >
                   Go To Microsoft Teams Interview
                 </a>
@@ -206,7 +248,7 @@ export default function InterviewDetailPage() {
               {canMarkAttendance && (
                 <button
                   onClick={() => setShowAttendanceModal(true)}
-                  className="px-6 py-2.5 rounded-lg text-sm font-semibold border border-gray-300 hover:bg-gray-50 transition"
+                  className="w-full text-center px-6 py-3 rounded-xl text-sm font-semibold border border-gray-300 hover:bg-gray-50 transition"
                 >
                   Candidate Attended Interview?
                 </button>
@@ -246,7 +288,7 @@ export default function InterviewDetailPage() {
         />
 
         {/* ================= EVALUATE SECTION ================= */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 my-8 flex justify-between items-center">
+        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 my-8 flex flex-col md:flex-row gap-4 md:justify-between md:items-center">
           <h3 className="text-lg font-bold text-[#101828]">
             {interview.feedbackSubmitted
               ? "Your Evaluation"
@@ -255,15 +297,21 @@ export default function InterviewDetailPage() {
 
           <button
             onClick={() => setIsEvaluationOpen(true)}
-            className="px-6 py-2 rounded-xl font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white transition"
+            disabled={!canEvaluate}
+            className={`w-full md:w-auto px-6 py-3 rounded-xl font-semibold text-sm transition
+    ${
+      canEvaluate
+        ? "bg-blue-600 hover:bg-blue-700 text-white"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    }`}
           >
             {interview.feedbackSubmitted ? "View / Edit" : "Evaluate"}
           </button>
         </div>
 
         {/* ================= BOTTOM INFO GRID ================= */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <InfoCard title="Education" value={interview.education?.degree} />
             <InfoCard
               title="Experience"
@@ -281,7 +329,7 @@ export default function InterviewDetailPage() {
       {/* ================= ATTENDANCE MODAL ================= */}
       {showAttendanceModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-[400px] text-center">
+          <div className="bg-white rounded-2xl p-8 w-[90%] max-w-[400px] text-center">
             <h3 className="text-lg font-bold mb-4">
               Did the candidate attend the interview?
             </h3>

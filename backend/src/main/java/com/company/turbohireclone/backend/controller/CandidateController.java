@@ -104,7 +104,7 @@ public class CandidateController {
      * Roles: HR / ADMIN
      */
     @GetMapping("/{candidateId}/resume")
-    @PreAuthorize("hasAnyRole('ADMIN','RECRUITER')")
+    @PreAuthorize("hasAnyRole('ADMIN','RECRUITER','USER')")
     public Resume getResume(
             @PathVariable Long candidateId
     ) {

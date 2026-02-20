@@ -1,4 +1,5 @@
 export default function SlotRow({ slot, onBook }) {
+  // console.log(slot)
   return (
     <div className="slot-row">
       <span>
@@ -7,8 +8,9 @@ export default function SlotRow({ slot, onBook }) {
       <button
         className="book-btn"
         onClick={() => onBook(slot.slotId)}
+        disabled={!slot.slotStatus == 'AVAILABLE'}
       >
-        Book
+        {slot.slotStatus == 'AVAILABLE'?'Book':'Booked'}
       </button>
     </div>
   );

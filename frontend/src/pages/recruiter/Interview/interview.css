@@ -89,6 +89,7 @@
   .slot-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background: #f8fafc;
     padding: 10px;
     border-radius: 8px;

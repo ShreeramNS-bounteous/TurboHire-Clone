@@ -66,6 +66,7 @@
   /* ===== Tab Content Animation ===== */
 
 .tab-content-wrapper {
+  margin-top: 20px;
     position: relative;
     padding: 24px 32px;
     min-height: 300px;
@@ -86,4 +87,16 @@
       transform: translateX(0px);
     }
   }
+
+  /* 🔥 Mobile Improvements */
+@media (max-width: 640px) {
+  .interviewer-tabs {
+    gap: 4px;
+  }
+
+  .interviewer-tab {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
   
