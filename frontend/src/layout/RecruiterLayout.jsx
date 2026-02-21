@@ -1,5 +1,5 @@
 // src/layout/RecruiterLayout.jsx
-import Navbar from "./Navbar";
+import Navbar from "../components/Navbar";
 import { Outlet } from "react-router-dom";
 
 export default function RecruiterLayout() {

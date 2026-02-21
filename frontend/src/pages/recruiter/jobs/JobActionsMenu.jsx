@@ -59,15 +59,16 @@ export default function JobActionsMenu({
   };
 
   return (
-    <>
-      <div className="relative" ref={ref} onClick={(e)=>e.stopPropagation()}>
+    <div onClick={(e) => e.stopPropagation()}>
+      
+      <div className="relative" ref={ref}>
         <button
           onClick={() => setOpen(!open)}
           className="border px-4 py-2 rounded text-sm"
         >
           Actions ▾
         </button>
-
+   
         {open && (
           <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow z-10">
             {!isClosed && (
@@ -80,27 +81,27 @@ export default function JobActionsMenu({
                 Add Candidate
               </MenuItem>
             )}
-
+   
             {!isClosed && (
               <MenuItem onClick={() => alert("Edit Job coming next")}>
                 Edit Job
               </MenuItem>
             )}
-
+   
             {!isClosed && <MenuItem onClick={handleClose}>Close Job</MenuItem>}
-
+   
             <MenuItem danger onClick={handleDelete}>
               Delete Job
             </MenuItem>
           </div>
         )}
       </div>
-
+   
       {pickerOpen && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-40">
           <div className="bg-white p-6 rounded shadow w-80">
             <h3 className="font-semibold mb-4">Add Candidate</h3>
-
+   
             <button
               className="w-full border p-2 mb-2 rounded"
               onClick={() => {
@@ -110,7 +111,7 @@ export default function JobActionsMenu({
             >
               Create New Candidate
             </button>
-
+   
             <button
               className="w-full border p-2 rounded"
               onClick={() => {
@@ -123,8 +124,7 @@ export default function JobActionsMenu({
           </div>
         </div>
       )}
-
-      {/* 🔥 NEW CANDIDATE DRAWER */}
+   
       <RightDrawer
         open={drawer === "new"}
         onClose={() => setDrawer(null)}
@@ -134,15 +134,14 @@ export default function JobActionsMenu({
           <AddNewCandidate
             job={job}
             onCreated={(createdCandidateId) => {
-              setDrawer(null); // close new drawer
+              setDrawer(null);
               setAutoSelectCandidateId(createdCandidateId);
-              setDrawer("existing"); // open existing drawer
+              setDrawer("existing");
             }}
           />
         )}
       </RightDrawer>
-
-      {/* 🔥 EXISTING CANDIDATE DRAWER */}
+   
       <RightDrawer
         open={drawer === "existing"}
         onClose={() => setDrawer(null)}
@@ -157,8 +156,10 @@ export default function JobActionsMenu({
           />
         )}
       </RightDrawer>
-    </>
+   
+    </div>
   );
+   
 }
 
 function MenuItem({ children, onClick, danger }) {

@@ -43,6 +43,6 @@ public class CandidatePortalToken {
     void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.active = true;
-        this.expiresAt = this.createdAt.plusDays(7);
+        this.expiresAt = this.createdAt.plusDays(30);
     }
 }
