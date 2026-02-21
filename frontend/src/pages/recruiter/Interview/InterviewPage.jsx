@@ -47,7 +47,7 @@ export default function InterviewPage() {
   const [filters, setFilters] = useState({
     date: getNowDate(),
     from: getNowTime(),
-    to: "18:00",
+    to: "23:00",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);

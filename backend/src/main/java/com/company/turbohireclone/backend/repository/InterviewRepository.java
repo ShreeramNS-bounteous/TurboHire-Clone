@@ -19,6 +19,8 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
 
     List<Interview> findByCandidateJob_Job_Id(Long jobId);
 
+    List<Interview> findByCandidateJob_Id(Long candidateJobId);
+
     boolean existsByCandidateJob_IdAndRound_RoundNameAndStatusIn(
             Long candidateJobId,
             String roundName,

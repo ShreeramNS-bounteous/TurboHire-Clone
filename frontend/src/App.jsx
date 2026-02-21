@@ -16,6 +16,7 @@ import InterviewerDashboard from "./pages/Interviewer/InterviewerDashboard";
 import InterviewDashboard from "./pages/recruiter/Interview/InterviewDashboard";
 import LandingPage from "./pages/LandingPage";
 import InterviewDetailPage from "./pages/Interviewer/InterviewerDetailPage";
+import CandidatePortal from "./pages/Candidate/CandidatePortal";
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/candidate-portal" element={<CandidatePortal/>} />
       </Routes>
     </BrowserRouter>
   );

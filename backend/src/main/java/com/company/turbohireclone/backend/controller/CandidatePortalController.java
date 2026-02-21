@@ -1,12 +1,11 @@
 package com.company.turbohireclone.backend.controller;
 
+import com.company.turbohireclone.backend.dto.candidate.CandidateProfileResponse;
 import com.company.turbohireclone.backend.dto.candidatePortal.CandidatePortalResponse;
+import com.company.turbohireclone.backend.dto.candidatePortal.CandidateProfileUpdateRequest;
 import com.company.turbohireclone.backend.services.CandidatePortalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/candidate-portal")
@@ -20,5 +19,13 @@ public class CandidatePortalController {
             @RequestParam String token
     ) {
         return portalService.getPortalByToken(token);
+    }
+
+    @PostMapping("/profile")
+    public CandidateProfileResponse updateProfileByToken(
+            @RequestParam String token,
+            @RequestBody CandidateProfileUpdateRequest request
+    ) {
+        return portalService.updateProfile(token, request);
     }
 }

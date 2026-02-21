@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import { Filter, LogOut, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, LogOut } from "lucide-react";
+import BaseNavbar from "./BaseNavbar";
+import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ interviewer, onOpenFilters }) => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+export default function InterviewerNavbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
-  // 🔥 SAFE ACCESS
-  const fullName = interviewer?.fullName || "Interviewer";
-  const email = interviewer?.email || "";
+  const fullName = user?.fullName || "Interviewer";
+  const email = user?.email || "";
+
   const initials = fullName
     .split(" ")
     .map((n) => n[0])
@@ -15,75 +19,50 @@ const Navbar = ({ interviewer, onOpenFilters }) => {
     .substring(0, 2)
     .toUpperCase();
 
-  const navigate = useNavigate();
-
-  const goToAbout = () => {
-    navigate("/interviewer"); // Navigate to /about page
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
-  return (
-    <div className="h-16 bg-[#101828] text-white flex items-center justify-between px-8 shrink-0 shadow-lg z-50">
-      {/* LEFT LOGO */}
-      <div className="flex items-center gap-3 cursor-pointer"  onClick={goToAbout}>
-        <div
-          className="w-10 h-10 bg-black rounded-md flex items-center justify-center relative overflow-hidden shadow-md shadow-gray-700 group-hover:shadow-md transition-all">
-          <div className="absolute inset-0 bg-gray-900 group-hover:bg-black transition-colors"></div>
-          <span className="relative z-10 text-[#008AFF] font-bold text-xl mr-[1px]">
-            T
-          </span>
-          <span className="relative z-10 text-white font-bold text-xl">H</span>
+  const rightContent = (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-3 hover:bg-white/10 p-2 rounded-xl"
+      >
+        <div className="h-9 w-9 bg-[#007bff] rounded-xl flex items-center justify-center font-bold">
+          {initials}
         </div>
-        <span className="font-bold tracking-tight text-lg">TurboHire</span>
-      </div>
 
-      {/* RIGHT SIDE */}
-      <div className="flex items-center gap-6">
-    
-        <div className="relative">
+        <div className="hidden md:block text-left">
+          <p className="text-xs font-bold">{fullName}</p>
+          <p className="text-[10px] text-gray-400">Interviewer</p>
+        </div>
+
+        <ChevronDown size={14} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl text-[#101828]">
+          <div className="px-4 py-3 border-b">
+            <p className="text-sm font-bold truncate">{email}</p>
+          </div>
+
           <button
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-3 hover:bg-white/10 p-1.5 pr-3 rounded-2xl transition-all"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50"
           >
-            <div className="h-9 w-9 bg-[#007bff] rounded-xl flex items-center justify-center font-bold text-white shadow-md">
-              {initials}
-            </div>
-
-            <div className="text-left hidden md:block">
-              <p className="text-xs font-bold leading-none">{fullName}</p>
-              <p className="text-[10px] text-gray-400 font-medium mt-1">
-                Interviewer
-              </p>
-            </div>
-
-            <ChevronDown
-              size={14}
-              className={`text-gray-400 transition-transform ${
-                isProfileOpen ? "rotate-180" : ""
-              }`}
-            />
+            <LogOut size={16} /> Sign Out
           </button>
-
-          {isProfileOpen && (
-            <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 text-[#101828]">
-              <div className="px-4 py-3 border-b border-gray-50">
-                <p className="text-sm font-bold truncate">{email}</p>
-              </div>
-
-              <button
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  window.location.href = "/";
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
-              >
-                <LogOut size={16} /> Sign Out
-              </button>
-            </div>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
-};
 
-export default Navbar;
+  return (
+    <BaseNavbar
+      leftContent={null}
+      rightContent={rightContent}
+    />
+  );
+}

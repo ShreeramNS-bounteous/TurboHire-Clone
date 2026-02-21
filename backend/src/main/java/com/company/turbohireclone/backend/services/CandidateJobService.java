@@ -115,7 +115,7 @@ public class CandidateJobService {
         tokenRepository.save(portalToken);
 
         System.out.println(
-                "📩 Candidate Portal URL: http://localhost:8080/api/candidate-portal?token=" + token
+                "📩 Candidate Portal URL: http://localhost:5173/candidate-portal?token=" + token
         );
 
         return cj.getId();
