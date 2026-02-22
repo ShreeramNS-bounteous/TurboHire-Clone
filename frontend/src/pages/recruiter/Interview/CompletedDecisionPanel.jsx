@@ -24,27 +24,40 @@ export default function CompletedDecisionPanel({
     interview.decisionStatus !== "PENDING_DECISION";
  
   const hasNextRound = interview.hasNextRound === true;
+
+  const isNoShow = interview.attendanceStatus === "NO_SHOW";
  
   // =========================
   // BUTTON DISABLE LOGIC
   // =========================
-  const disableMoveNext =
-    loading ||
-    isFeedbackMissing ||
-    decisionTaken ||
-    !hasNextRound;
- 
-  const disableHire =
-    loading ||
-    isFeedbackMissing ||
-    decisionTaken ||
-    hasNextRound;
- 
-  const disableReject =
-    loading ||
-    isFeedbackMissing ||
-    decisionTaken;
- 
+  // =========================
+// BUTTON DISABLE LOGIC (FIXED)
+// =========================
+
+// Move to next round:
+// Requires feedback AND not NO_SHOW
+const disableMoveNext =
+loading ||
+decisionTaken ||
+!hasNextRound ||
+isNoShow ||
+isFeedbackMissing;
+
+// Hire:
+// Requires feedback AND not NO_SHOW
+const disableHire =
+loading ||
+decisionTaken ||
+hasNextRound ||
+isNoShow ||
+isFeedbackMissing;
+
+// Reject:
+// Allowed if NO_SHOW OR feedback exists
+const disableReject =
+loading ||
+decisionTaken ||
+(!isNoShow && isFeedbackMissing);
   // =========================
   // ACTION HANDLERS
   // =========================
@@ -124,43 +137,46 @@ export default function CompletedDecisionPanel({
         <div className="info-row">
           <span>Attendance</span>
           <span className="badge attended">
-            {interview.attendanceStatus}
+            {interview.attendanceStatus.replace(/_+/g, " ").trim()}
           </span>
         </div>
  
         <div className="info-row">
           <span>Decision</span>
           <span className="badge success">
-            {interview.decisionStatus}
+            {interview.decisionStatus.replace(/_+/g, " ").trim()}
           </span>
         </div>
       </div>
  
       {/* ========================= FEEDBACK ========================= */}
-      <div className="feedback-card">
-        <h4>Interview Feedback</h4>
- 
-        {isFeedbackMissing ? (
-          <div className="comments muted">
-            Feedback not submitted yet.
-          </div>
-        ) : (
-          <>
-            <div className="rating-row">
-              <span>Rating</span>
-              <div>⭐ {interview.rating}/5</div>
-            </div>
- 
-            <div className="recommendation">
-              Recommendation:
-              <span className="badge recommend">
-                {interview.recommendation}
-              </span>
-            </div>
-          </>
-        )}
+      
+     {/* ========================= FEEDBACK ========================= */}
+{!isNoShow && (
+  <div className="feedback-card">
+    <h4>Interview Feedback</h4>
+
+    {isFeedbackMissing ? (
+      <div className="comments muted">
+        Feedback not submitted yet.
       </div>
- 
+    ) : (
+      <>
+        <div className="rating-row">
+          <span>Rating</span>
+          <div>⭐ {interview.rating}/5</div>
+        </div>
+
+        <div className="recommendation">
+          Recommendation:
+          <span className="badge recommend">
+            {interview.recommendation}
+          </span>
+        </div>
+      </>
+    )}
+  </div>
+)}
       {/* ========================= ACTIONS ========================= */}
       <div className="decision-actions">
         <button
