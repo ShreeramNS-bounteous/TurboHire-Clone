@@ -17,6 +17,7 @@ import InterviewDashboard from "./pages/recruiter/Interview/InterviewDashboard";
 import LandingPage from "./pages/LandingPage";
 import InterviewDetailPage from "./pages/Interviewer/InterviewerDetailPage";
 import CandidatePortal from "./pages/Candidate/CandidatePortal";
+import SetNewPassword from "./pages/SetNewPassword";
 
 function App() {
   return (
@@ -36,6 +37,14 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route index element={<LandingPage />} />
+        <Route
+          path="/set-new-password"
+          element={
+            <ProtectedRoute>
+              <SetNewPassword />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/recruiter"
           element={
@@ -72,7 +81,7 @@ function App() {
           path="/interviewer/interview/:id"
           element={
             <ProtectedRoute roles={["USER"]}>
-              <InterviewDetailPage/>
+              <InterviewDetailPage />
             </ProtectedRoute>
           }
         />
@@ -85,7 +94,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/candidate-portal" element={<CandidatePortal/>} />
+        <Route path="/candidate-portal" element={<CandidatePortal />} />
       </Routes>
     </BrowserRouter>
   );

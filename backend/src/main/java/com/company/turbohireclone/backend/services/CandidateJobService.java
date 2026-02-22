@@ -4,6 +4,7 @@ import com.company.turbohireclone.backend.common.SystemLogger;
 import com.company.turbohireclone.backend.entity.*;
 import com.company.turbohireclone.backend.entity.*;
 import com.company.turbohireclone.backend.enums.CandidateLockStatus;
+import com.company.turbohireclone.backend.notification.NotificationService;
 import com.company.turbohireclone.backend.repository.*;
 import com.company.turbohireclone.backend.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CandidateJobService {
     private final PipelineStageHistoryRepository pipelineStageHistoryRepository;
     private final CandidatePortalTokenRepository tokenRepository;
     private final SystemLogger systemLogger;
+    private final NotificationService notificationService;
 
     // ===============================
     // ADD CANDIDATE TO PIPELINE
@@ -114,6 +116,16 @@ public class CandidateJobService {
 
         tokenRepository.save(portalToken);
 
+        String portalUrl =
+                "http://localhost:5173/candidate-portal?token=" + token;
+
+        notificationService.notifyCandidateShortlisted(
+                candidate.getFullName(),
+                candidate.getEmail(),
+                job.getTitle(),
+                portalUrl
+        );
+
         System.out.println(
                 "📩 Candidate Portal URL: http://localhost:5173/candidate-portal?token=" + token
         );
@@ -123,26 +135,7 @@ public class CandidateJobService {
 
     // ===============================
     // MOVE PIPELINE STAGE
-    // ===============================
-    public void moveStage(Long candidateJobId, String nextStage, Long actorUserId) {
 
-        CandidateJob cj = candidateJobRepository.findById(candidateJobId)
-                .orElseThrow(() -> new RuntimeException("CandidateJob not found"));
-
-        String prevStage = cj.getCurrentStage();
-        cj.setCurrentStage(nextStage);
-
-        candidateJobRepository.save(cj);
-
-        pipelineStageHistoryRepository.save(
-                PipelineStageHistory.create(
-                        candidateJobId,
-                        prevStage,
-                        nextStage,
-                        actorUserId
-                )
-        );
-    }
 
     // ===============================
     // REJECT CANDIDATE

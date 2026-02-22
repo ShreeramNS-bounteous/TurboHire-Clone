@@ -29,12 +29,12 @@ export default function Navbar() {
       <NavLink to="/recruiter/interviews" className={linkClass}>
         Interview
       </NavLink>
-      <NavLink to="/recruiter/pipeline" className={linkClass}>
+      {/* <NavLink to="/recruiter/pipeline" className={linkClass}>
         Onboard
       </NavLink>
       <NavLink to="/recruiter/reports" className={linkClass}>
         Reports
-      </NavLink>
+      </NavLink> */}
     </nav>
   );
 

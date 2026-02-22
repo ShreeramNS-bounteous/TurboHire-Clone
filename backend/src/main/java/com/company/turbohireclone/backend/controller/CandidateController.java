@@ -5,12 +5,15 @@ import com.company.turbohireclone.backend.dto.candidate.*;
 import com.company.turbohireclone.backend.entity.Candidate;
 import com.company.turbohireclone.backend.entity.CandidateProfile;
 import com.company.turbohireclone.backend.entity.Resume;
+import com.company.turbohireclone.backend.repository.UserRepository;
 import com.company.turbohireclone.backend.security.util.SecurityUtils;
 import com.company.turbohireclone.backend.services.CandidateService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ import java.util.List;
 public class CandidateController {
 
     private final CandidateService candidateService;
+    private final UserRepository userRepository;
 
     /**
      * CREATE candidate
@@ -32,6 +36,15 @@ public class CandidateController {
     ) {
 
         Long actorUserId = SecurityUtils.getCurrentUserId();
+
+
+
+        if(userRepository.existsByEmail(req.getEmail())){
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Employee with email already exists"
+            );
+        }
 
         Candidate candidate = Candidate.builder()
                 .fullName(req.getFullName())

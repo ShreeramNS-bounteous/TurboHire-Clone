@@ -5,6 +5,6 @@ export const loginApi = async (email, password) => {
     email,
     password,
   });
-  console.log(res.data.accessToken)
-  return res.data.accessToken; // { accessToken }
+
+  return res.data; // return full object
 };

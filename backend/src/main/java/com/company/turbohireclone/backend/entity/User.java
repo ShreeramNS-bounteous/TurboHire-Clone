@@ -46,8 +46,14 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "password_temporary", nullable = false)
+    private  Boolean passwordTemporary = false;
+
     @PrePersist
     private void prePersist() {
+        if(this.passwordTemporary == null){
+            this.passwordTemporary = false;
+        }
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
             this.status = "ACTIVE";
