@@ -33,7 +33,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/**",
-                                "/api/candidate-portal/**"
+                                "/api/candidate-portal/**",
+                                "/test-email"
                         )
                         .permitAll()
                         .anyRequest().authenticated()

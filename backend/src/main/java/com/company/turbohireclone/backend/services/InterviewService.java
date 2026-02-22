@@ -6,6 +6,7 @@ import com.company.turbohireclone.backend.dto.interview.PendingInterviewDto;
 import com.company.turbohireclone.backend.dto.interview.ScheduledInterviewDto;
 import com.company.turbohireclone.backend.entity.*;
 import com.company.turbohireclone.backend.enums.*;
+import com.company.turbohireclone.backend.notification.NotificationService;
 import com.company.turbohireclone.backend.repository.*;
 import com.company.turbohireclone.backend.entity.*;
 import com.company.turbohireclone.backend.enums.*;
@@ -13,6 +14,7 @@ import com.company.turbohireclone.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +39,8 @@ public class InterviewService {
     private final InterviewSlotBookingRepository interviewSlotBookingRepository;
     private final SystemLogger systemLogger;
     private final InterviewFeedbackRepository feedbackRepository;
+    private final NotificationService notificationService;
+    private  final CandidatePortalTokenRepository tokenRepository;
 
     // Create interview
     @Transactional
@@ -195,6 +199,49 @@ public class InterviewService {
 // Move stage
         candidateJob.setCurrentStage(roundName);
         candidateJobRepository.save(candidateJob);
+
+        // 🔥 Format datetime
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("EEEE, dd MMM yyyy 'at' hh:mm a");
+
+        String formattedDateTime =
+                interviewStart.format(formatter);// or format nicely if needed
+
+        Candidate candidate = interview.getCandidateJob().getCandidate();
+        Job job = interview.getCandidateJob().getJob();
+
+// Candidate portal URL
+        String portalUrl =
+                "http://localhost:5173/candidate-portal?token=" +
+                        tokenRepository.findByCandidateJob_Id(
+                                interview.getCandidateJob().getId()
+                        ).get().getToken();
+
+// Interviewer detail URL
+        String interviewDetailUrl =
+                "http://localhost:5173/interviewer/interview/" +
+                        interview.getId();
+
+// 🔔 Send candidate email
+        notificationService.notifyCandidateInterviewScheduled(
+                candidate.getFullName(),
+                candidate.getEmail(),
+                roundName,
+                job.getTitle(),
+                formattedDateTime,
+                portalUrl
+        );
+
+// 🔔 Send interviewer email
+        notificationService.notifyInterviewerInterviewScheduled(
+                interviewer.getFullName(),
+                interviewer.getEmail(),
+                candidate.getFullName(),
+                job.getTitle(),
+                roundName,
+                formattedDateTime,
+                interviewDetailUrl
+        );
 
 // Save stage history
         pipelineStageHistoryRepository.save(
@@ -515,6 +562,33 @@ public class InterviewService {
                 "MOVE_TO_NEXT_ROUND"
         );
 
+        // 🔔 Send Stage Advanced Email
+
+        Candidate candidate = candidateJob.getCandidate();
+        Job job = candidateJob.getJob();
+
+// Fetch portal token
+        CandidatePortalToken portalToken =
+                tokenRepository.findByCandidateJob_Id(candidateJob.getId())
+                        .orElse(null);
+
+        String portalUrl = null;
+
+        if (portalToken != null) {
+            portalUrl =
+                    "http://localhost:5173/candidate-portal?token="
+                            + portalToken.getToken();
+        }
+
+        notificationService.notifyCandidateStageAdvanced(
+                candidate.getFullName(),
+                candidate.getEmail(),
+                job.getTitle(),
+                previousStage,
+                nextRound.getRoundName(),
+                portalUrl
+        );
+
         // ✅ 8️⃣ IMPORTANT: DO NOT create interview here
         // Interview for next round will be created only when recruiter books slot
     }
@@ -548,6 +622,31 @@ public class InterviewService {
                         actorUserId
                 )
         );
+
+        // 🔔 Send Hired Email
+
+        Candidate candidate = cj.getCandidate();
+        Job job = cj.getJob();
+
+// Fetch portal token
+        CandidatePortalToken portalToken =
+                tokenRepository.findByCandidateJob_Id(cj.getId())
+                        .orElse(null);
+
+        String portalUrl = null;
+
+        if (portalToken != null) {
+            portalUrl =
+                    "http://localhost:5173/candidate-portal?token="
+                            + portalToken.getToken();
+        }
+
+        notificationService.notifyCandidateHired(
+                candidate.getFullName(),
+                candidate.getEmail(),
+                job.getTitle(),
+                portalUrl
+        );
     }
 
     @Transactional
@@ -564,6 +663,31 @@ public class InterviewService {
 
         interview.setDecisionStatus(DecisionStatus.REJECTED);
         interviewRepository.save(interview);
+
+        // 🔔 Send Rejection Email
+
+        Candidate candidate = cj.getCandidate();
+        Job job = cj.getJob();
+
+// Fetch existing portal token
+        CandidatePortalToken portalToken =
+                tokenRepository.findByCandidateJob_Id(cj.getId())
+                        .orElse(null);
+
+        String portalUrl = null;
+
+        if (portalToken != null) {
+            portalUrl =
+                    "http://localhost:5173/candidate-portal?token="
+                            + portalToken.getToken();
+        }
+
+        notificationService.notifyCandidateRejected(
+                candidate.getFullName(),
+                candidate.getEmail(),
+                job.getTitle(),
+                portalUrl
+        );
 
         pipelineStageHistoryRepository.save(
                 PipelineStageHistory.create(

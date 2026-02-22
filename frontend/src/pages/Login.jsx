@@ -17,27 +17,31 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       setLoading(true);
-
-      // 🔑 LOGIN API
-      const token = await loginApi(email, password);
-
-      // 🔑 STORE TOKEN
-      login(token);
-
-      // 🔑 DECODE ROLE
-      const payload = JSON.parse(atob(token.split(".")[1]));
+  
+      const response = await loginApi(email, password);
+  
+      const { accessToken, passwordTemporary } = response;
+  
+      login(accessToken);
+  
+      // 🚨 If temporary password → force change
+      if (passwordTemporary) {
+        navigate("/set-new-password");
+        return;
+      }
+  
+      const payload = JSON.parse(atob(accessToken.split(".")[1]));
       const role = payload.role;
-
-      // 🔑 ROUTE BASED ON ROLE
+  
       if (role === "ADMIN") navigate("/admin");
       else if (role === "RECRUITER") navigate("/recruiter/jobs");
       else if (role === "USER") navigate("/interviewer");
       else navigate("/login");
+  
     } catch (err) {
-      console.error(err);
       setError("Invalid email or password");
     } finally {
       setLoading(false);

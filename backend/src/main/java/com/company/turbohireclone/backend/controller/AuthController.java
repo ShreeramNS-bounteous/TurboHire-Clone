@@ -2,6 +2,8 @@ package com.company.turbohireclone.backend.controller;
 
 import com.company.turbohireclone.backend.dto.loginDto.LoginRequest;
 import com.company.turbohireclone.backend.dto.loginDto.LoginResponse;
+import com.company.turbohireclone.backend.dto.loginDto.SetNewPasswordRequest;
+import com.company.turbohireclone.backend.security.util.SecurityUtils;
 import com.company.turbohireclone.backend.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,17 +15,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * LOGIN API
-     */
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
 
-        String token = authService.login(
+        return authService.login(
                 request.getEmail(),
                 request.getPassword()
         );
+    }
 
-        return new LoginResponse(token);
+    @PutMapping("/set-new-password")
+    public void setNewPassword(@RequestBody SetNewPasswordRequest req) {
+
+        Long userId = SecurityUtils.getCurrentUserId();
+
+        authService.setNewPassword(userId, req.getNewPassword());
     }
 }
