@@ -139,7 +139,7 @@ export default function Interviews({ interviewsData }) {
                           : "bg-blue-50 text-blue-700 border-blue-200"
                       }`}
                   >
-                    {item.status}
+                    {item.status.replace(/_+/g, " ").trim()}
                   </span>
                 </div>
             

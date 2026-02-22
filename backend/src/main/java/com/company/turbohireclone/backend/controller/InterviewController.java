@@ -1,6 +1,6 @@
 package com.company.turbohireclone.backend.controller;
 
-import com.company.turbohireclone.backend.dto.interview.*;
+
 import com.company.turbohireclone.backend.dto.interview.*;
 import com.company.turbohireclone.backend.dto.interviewer.MarkAttendanceRequestDto;
 import com.company.turbohireclone.backend.entity.Interview;
@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/interviews")
@@ -110,32 +110,6 @@ public class InterviewController {
 
 
 
-
-
-
-    @PreAuthorize("hasAnyRole('RECRUITER','USER')")
-    @GetMapping("/{id}")
-    public ResponseEntity<InterviewResponseDto> getInterview(@PathVariable Long id) {
-        Interview interview = interviewService.getInterview(id);
-        return ResponseEntity.ok(mapToDto(interview));
-    }
-
-    @PreAuthorize("hasRole('RECRUITER')")
-    @GetMapping("/job/{jobId}")
-    public ResponseEntity<List<InterviewSummaryDto>> getInterviewsForJob(@PathVariable Long jobId) {
-        List<InterviewSummaryDto> list = interviewService.getInterviewsForJob(jobId).stream()
-                .map(this::mapToSummaryDto).collect(Collectors.toList());
-        return ResponseEntity.ok(list);
-    }
-
-    @PreAuthorize("hasRole('RECRUITER')")
-    @GetMapping("/candidate/{candidateId}")
-    public ResponseEntity<List<InterviewSummaryDto>> getInterviewsForCandidate(@PathVariable Long candidateId) {
-        List<InterviewSummaryDto> list = interviewService.getInterviewsForCandidate(candidateId).stream()
-                .map(this::mapToSummaryDto).collect(Collectors.toList());
-        return ResponseEntity.ok(list);
-    }
-
     @PreAuthorize("hasRole('RECRUITER')")
     @PutMapping("/{id}/cancel")
     public ResponseEntity<Void> cancelInterview(@PathVariable Long id) {
@@ -210,12 +184,4 @@ public class InterviewController {
                 .build();
     }
 
-    private InterviewSummaryDto mapToSummaryDto(Interview i) {
-        return InterviewSummaryDto.builder()
-                .id(i.getId())
-                .candidateJobId(i.getCandidateJob().getId())
-                .jobRoundId(i.getRound().getId())
-                .status(i.getStatus().name())
-                .build();
-    }
 }
