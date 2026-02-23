@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { updateProfileByToken } from "../../api/candidatePortal.api";
+import toast from "react-hot-toast";
 
 export default function Personal({
   sidebarOpen,
@@ -7,48 +8,81 @@ export default function Personal({
   candidate,
   token
 }) {
-
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+
+  const [isFresher, setIsFresher] = useState(false);
 
   const [candidateProfileEntity, setCandidateProfileEntity] = useState({
     currentCompany: "",
-    totalExperience: 0,
+    totalExperience: "",
     skills: [],
-    education: {}
+    education: {
+      degree: "",
+      college: "",
+      year: ""
+    }
   });
 
+  // =========================
+  // SYNC DATA FROM BACKEND
+  // =========================
   useEffect(() => {
     if (candidate) {
+      const experience = candidate.totalExperience ?? 0;
+
       setCandidateProfileEntity({
         currentCompany: candidate.currentCompany || "",
-        totalExperience: candidate.totalExperience || 0,
+        totalExperience: experience,
         skills: candidate.skills || [],
-        education: candidate.education || {}
+        education: {
+          degree: candidate.education?.degree || "",
+          college: candidate.education?.college || "",
+          year: candidate.education?.year || ""
+        }
       });
+
+      setIsFresher(experience === 0);
     }
   }, [candidate]);
 
+  // =========================
+  // SAVE PROFILE
+  // =========================
   const handleSaveProfile = async () => {
     try {
       setIsSaving(true);
 
       const updated = await updateProfileByToken(token, {
-        totalExperience: candidateProfileEntity.totalExperience,
+        totalExperience: isFresher
+          ? 0
+          : Number(candidateProfileEntity.totalExperience),
         skills: candidateProfileEntity.skills,
         education: candidateProfileEntity.education,
-        currentCompany: candidateProfileEntity.currentCompany
+        currentCompany: isFresher
+          ? ""
+          : candidateProfileEntity.currentCompany
       });
 
-      setCandidateProfileEntity(updated);
+      const updatedExperience = updated.totalExperience ?? 0;
+
+      setCandidateProfileEntity({
+        currentCompany: updated.currentCompany || "",
+        totalExperience: updatedExperience,
+        skills: updated.skills || [],
+        education: {
+          degree: updated.education?.degree || "",
+          college: updated.education?.college || "",
+          year: updated.education?.year || ""
+        }
+      });
+
+      setIsFresher(updatedExperience === 0);
+
       setIsEditing(false);
-      setShowToast(true);
-
-      setTimeout(() => setShowToast(false), 2500);
-
+      toast.success("Profile Updated Successfully")
     } catch (err) {
-      console.error("Update failed:", err);
+      toast.error("Update failed:", err);
     } finally {
       setIsSaving(false);
     }
@@ -56,11 +90,7 @@ export default function Personal({
 
   return (
     <>
-      {showToast && (
-        <div className="fixed top-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded shadow-lg z-[999]">
-          Profile Updated Successfully
-        </div>
-      )}
+    
 
       {/* OVERLAY */}
       {sidebarOpen && (
@@ -75,7 +105,7 @@ export default function Personal({
         className={`fixed inset-y-0 right-0 w-[30rem] bg-white shadow-2xl z-50 transform transition-transform duration-300 overflow-y-auto
         ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-
+        {/* HEADER */}
         <div className="p-6 border-b">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-slate-800">
@@ -94,32 +124,8 @@ export default function Personal({
           <p className="text-sm text-slate-500">{candidate?.phone}</p>
         </div>
 
+        {/* CONTENT */}
         <div className="p-6 space-y-6">
-
-          {/* CURRENT COMPANY */}
-          <div>
-            <label className="text-xs font-bold text-slate-400 uppercase">
-              Current Company
-            </label>
-
-            {isEditing ? (
-              <input
-                type="text"
-                value={candidateProfileEntity.currentCompany}
-                onChange={(e) =>
-                  setCandidateProfileEntity({
-                    ...candidateProfileEntity,
-                    currentCompany: e.target.value
-                  })
-                }
-                className="mt-2 w-full border p-2 rounded"
-              />
-            ) : (
-              <p className="font-semibold">
-                {candidateProfileEntity.currentCompany || "Not Added"}
-              </p>
-            )}
-          </div>
 
           {/* EXPERIENCE */}
           <div>
@@ -128,24 +134,74 @@ export default function Personal({
             </label>
 
             {isEditing ? (
-              <input
-                type="number"
-                step="0.5"
-                value={candidateProfileEntity.totalExperience}
-                onChange={(e) =>
-                  setCandidateProfileEntity({
-                    ...candidateProfileEntity,
-                    totalExperience: e.target.value
-                  })
-                }
-                className="mt-2 w-full border p-2 rounded"
-              />
+              <div className="mt-2 space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={isFresher}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setIsFresher(checked);
+                      setCandidateProfileEntity({
+                        ...candidateProfileEntity,
+                        totalExperience: checked ? 0 : ""
+                      });
+                    }}
+                  />
+                  <span className="text-sm">Fresher</span>
+                </div>
+
+                {!isFresher && (
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={candidateProfileEntity.totalExperience}
+                    onChange={(e) =>
+                      setCandidateProfileEntity({
+                        ...candidateProfileEntity,
+                        totalExperience: e.target.value
+                      })
+                    }
+                    className="w-full border p-2 rounded"
+                  />
+                )}
+              </div>
             ) : (
               <p className="font-semibold">
-                {candidateProfileEntity.totalExperience} Years
+                {isFresher
+                  ? "Fresher"
+                  : `${candidateProfileEntity.totalExperience} Years`}
               </p>
             )}
           </div>
+
+          {/* CURRENT COMPANY */}
+          {!isFresher && (
+            <div>
+              <label className="text-xs font-bold text-slate-400 uppercase">
+                Current Company
+              </label>
+
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={candidateProfileEntity.currentCompany}
+                  onChange={(e) =>
+                    setCandidateProfileEntity({
+                      ...candidateProfileEntity,
+                      currentCompany: e.target.value
+                    })
+                  }
+                  className="mt-2 w-full border p-2 rounded"
+                />
+              ) : (
+                <p className="font-semibold">
+                  {candidateProfileEntity.currentCompany || "Not Added"}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* SKILLS */}
           <div>
@@ -160,7 +216,9 @@ export default function Personal({
                 onChange={(e) =>
                   setCandidateProfileEntity({
                     ...candidateProfileEntity,
-                    skills: e.target.value.split(",").map(s => s.trim())
+                    skills: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
                   })
                 }
                 className="mt-2 w-full border p-2 rounded"
@@ -175,6 +233,77 @@ export default function Personal({
                     {skill}
                   </span>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* EDUCATION */}
+          <div>
+            <label className="text-xs font-bold text-slate-400 uppercase">
+              Education
+            </label>
+
+            {isEditing ? (
+              <div className="space-y-3 mt-2">
+                <input
+                  type="text"
+                  placeholder="Degree"
+                  value={candidateProfileEntity.education.degree}
+                  onChange={(e) =>
+                    setCandidateProfileEntity({
+                      ...candidateProfileEntity,
+                      education: {
+                        ...candidateProfileEntity.education,
+                        degree: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full border p-2 rounded"
+                />
+
+                <input
+                  type="text"
+                  placeholder="College"
+                  value={candidateProfileEntity.education.college}
+                  onChange={(e) =>
+                    setCandidateProfileEntity({
+                      ...candidateProfileEntity,
+                      education: {
+                        ...candidateProfileEntity.education,
+                        college: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full border p-2 rounded"
+                />
+
+                <input
+                  type="number"
+                  placeholder="Year of Graduation"
+                  value={candidateProfileEntity.education.year}
+                  onChange={(e) =>
+                    setCandidateProfileEntity({
+                      ...candidateProfileEntity,
+                      education: {
+                        ...candidateProfileEntity.education,
+                        year: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full border p-2 rounded"
+                />
+              </div>
+            ) : (
+              <div className="mt-2">
+                <p className="font-semibold">
+                  {candidateProfileEntity.education.degree || "Not Added"}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {candidateProfileEntity.education.college}
+                </p>
+                <p className="text-sm text-slate-400">
+                  {candidateProfileEntity.education.year}
+                </p>
               </div>
             )}
           </div>
@@ -214,7 +343,6 @@ export default function Personal({
               </div>
             </div>
           )}
-
         </div>
       </div>
     </>
