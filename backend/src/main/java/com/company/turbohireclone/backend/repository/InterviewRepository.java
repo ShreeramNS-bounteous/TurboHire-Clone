@@ -5,6 +5,7 @@ import com.company.turbohireclone.backend.entity.CandidateJob;
 import com.company.turbohireclone.backend.entity.JobRound;
 import com.company.turbohireclone.backend.enums.InterviewStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,10 +33,17 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
 
     List<Interview> findByStatus(InterviewStatus status);
 
+    long countByStatus(String status);
 
+    long countByCandidateJob_Job_Id(Long jobId);
 
-
-
+    @Query("""
+SELECT to_char(i.scheduledAt, 'YYYY-MM') as month, count(i)
+FROM Interview i
+GROUP BY month
+ORDER BY month
+""")
+    List<Object[]> interviewsPerMonth();
 
 
 //    @Query("""

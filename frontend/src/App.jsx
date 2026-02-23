@@ -18,6 +18,7 @@ import LandingPage from "./pages/LandingPage";
 import InterviewDetailPage from "./pages/Interviewer/InterviewerDetailPage";
 import CandidatePortal from "./pages/Candidate/CandidatePortal";
 import SetNewPassword from "./pages/SetNewPassword";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
   return (
@@ -90,7 +91,7 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute roles={["ADMIN"]}>
-              <div>Admin Dashboard</div>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
