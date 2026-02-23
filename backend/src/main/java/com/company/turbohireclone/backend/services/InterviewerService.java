@@ -187,8 +187,15 @@ public class InterviewerService {
             LocalDate date,
             LocalTime from,
             LocalTime to,
-            String expertise
+            String expertise,
+            Long actorUserId
     ) {
+
+        User actor = userRepository.findById(actorUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Long actorBuId = actor.getBusinessUnit().getId();
+
 
         List<InterviewerSlot> slots =
                 slotRepository.findBySlotDateAndStatusAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
@@ -225,6 +232,10 @@ public class InterviewerService {
         Map<Long, User> userMap =
                 userRepository.findByIdIn(userIds)
                         .stream()
+                        .filter(user ->
+                                user.getBusinessUnit() != null &&
+                                        user.getBusinessUnit().getId().equals(actorBuId)
+                        )
                         .collect(Collectors.toMap(User::getId, u -> u));
 
         Map<Long, InterviewerProfile> profileMap =
@@ -233,6 +244,7 @@ public class InterviewerService {
                         .collect(Collectors.toMap(InterviewerProfile::getUserId, p -> p));
 
         return slotsByUser.entrySet().stream()
+                .filter(entry -> userMap.containsKey(entry.getKey()))
 
                 // 🔥 2️⃣ FILTER BY EXPERTISE (OPTIONAL)
                 .filter(entry -> {

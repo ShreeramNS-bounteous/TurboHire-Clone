@@ -143,8 +143,12 @@ decisionTaken ||
  
         <div className="info-row">
           <span>Decision</span>
-          <span className="badge success">
-            {interview.decisionStatus.replace(/_+/g, " ").trim()}
+          <span className={`badge   ${
+      interview.decisionStatus === "REJECTED"
+        ? "bg-red-100 text-red-700 border-red-300"
+        : "success"
+    } `}>
+            {interview.decisionStatus ? interview.decisionStatus.replace(/_+/g, " ").trim():'PENDING DECISION'}
           </span>
         </div>
       </div>

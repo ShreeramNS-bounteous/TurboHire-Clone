@@ -5,6 +5,7 @@ import com.company.turbohireclone.backend.dto.interviewer.*;
 import com.company.turbohireclone.backend.dto.interviewer.*;
 import com.company.turbohireclone.backend.entity.InterviewerProfile;
 import com.company.turbohireclone.backend.entity.InterviewerSlot;
+import com.company.turbohireclone.backend.security.util.SecurityUtils;
 import com.company.turbohireclone.backend.services.InterviewerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -111,8 +112,9 @@ public class InterviewerController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime to,
             @RequestParam(required = false) String expertise
     ) {
+        Long actorUserId = SecurityUtils.getCurrentUserId();
         return ResponseEntity.ok(
-                interviewerService.getAvailableInterviewersForHr(date, from, to,expertise)
+                interviewerService.getAvailableInterviewersForHr(date, from, to,expertise,actorUserId)
         );
     }
 

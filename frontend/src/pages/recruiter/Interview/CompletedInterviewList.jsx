@@ -52,11 +52,18 @@ export default function CompletedInterviewList({
 
                 <div className="badge-row">
                   <span className="badge completed">
-                    {intv.attendanceStatus}
+                    {intv.attendanceStatus && intv.attendanceStatus.replace(/_+/g, " ").trim()}
                   </span>
 
-                  <span className="badge success">
-                    {intv.decisionStatus}
+                  <span className={`badge   ${
+      intv.decisionStatus === "REJECTED"
+        ? "bg-red-100 text-red-700 border-red-300"
+        : "success"
+    } `}>
+                    
+                  {intv.decisionStatus
+  ? intv.decisionStatus.replace(/_+/g, " ").trim()
+  : "PENDING DECISION"}
                   </span>
                 </div>
               </div>

@@ -54,23 +54,26 @@ export default function Jobs() {
   }
 
   return (
-    <div>
+    <div className="px-4 sm:px-6 lg:px-8 py-6">
+  
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Jobs</h1>
-
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold">
+          Jobs
+        </h1>
+  
         <button
           onClick={() => navigate("/recruiter/jobs/create")}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
         >
           + Create Job
         </button>
       </div>
-
-      {/* Jobs Table */}
-      <div className="bg-white rounded shadow">
-        <table className="w-full">
-          <thead className="border-b">
+  
+      {/* Table Wrapper */}
+      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+        <table className="min-w-[700px] w-full text-sm">
+          <thead className="border-b bg-gray-50">
             <tr>
               <th className="text-left p-4">Title</th>
               <th className="text-left p-4">Business Unit</th>
@@ -86,7 +89,7 @@ export default function Jobs() {
                 <td className="p-4">{getBuName(job)}</td>
                 <td className="p-4">{job.location}</td>
                 <td className="p-4 font-semibold">{job.status}</td>
-                <td className="p-4 text-right space-x-2">
+                <td className="p-4 text-right space-x-3">
                   {job.status === "DRAFT" && (
                     <button
                       onClick={() => handlePublish(job.id)}
@@ -95,7 +98,6 @@ export default function Jobs() {
                       Publish
                     </button>
                   )}
-
                   {job.status === "OPEN" && (
                     <button
                       onClick={() => handleClose(job.id)}
@@ -107,7 +109,7 @@ export default function Jobs() {
                 </td>
               </tr>
             ))}
-
+  
             {jobs.length === 0 && (
               <tr>
                 <td colSpan="5" className="p-4 text-gray-500">
