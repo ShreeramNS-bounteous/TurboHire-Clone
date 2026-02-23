@@ -3,6 +3,7 @@ import api from "../../api/axios";
 import RightDrawer from "../../components/RightDrawer";
 import CandidateRow from "./CandidateRow";
 import CandidateProfileDrawer from "./CandidateProfileDrawer";
+import AddNewCandidate from "../recruiter/AddNewCandidate";
 
 const PAGE_SIZE = 5;
 
@@ -16,6 +17,7 @@ export default function Candidates() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [resume, setResume] = useState(null);
   const [loadingDrawer, setLoadingDrawer] = useState(false);
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
 
   useEffect(() => {
     api.get("/api/candidates").then((res) => {
@@ -63,7 +65,16 @@ export default function Candidates() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <h1 className="text-2xl font-semibold mb-6">Candidates</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold">Candidates</h1>
+
+        <button
+          onClick={() => setCreateDrawerOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
+        >
+          + Add Candidate
+        </button>
+      </div>
 
       <div className="space-y-4">
         {paginated.map((c) => (
@@ -118,6 +129,22 @@ export default function Candidates() {
           candidate={selectedCandidate}
           profile={selectedProfile}
           resume={resume}
+        />
+      </RightDrawer>
+      <RightDrawer
+        open={createDrawerOpen}
+        onClose={() => setCreateDrawerOpen(false)}
+        title="Create Candidate"
+      >
+        <AddNewCandidate
+          onCreated={() => {
+            setCreateDrawerOpen(false);
+
+            // Refresh list
+            api.get("/api/candidates").then((res) => {
+              setCandidates(res.data || []);
+            });
+          }}
         />
       </RightDrawer>
     </div>
