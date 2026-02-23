@@ -1,43 +1,42 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
 import { Toaster } from "react-hot-toast";
+
+import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage";
+import SetNewPassword from "./pages/SetNewPassword";
+
 import ProtectedRoute from "./auth/ProtectedRoute";
+
 import RecruiterLayout from "./layout/RecruiterLayout";
+import AdminLayout from "./layout/AdminLayout";
+
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import BusinessUnits from "./pages/recruiter/BusinessUnits";
-import Jobs from "./pages/recruiter/Jobs";
+import JobsDashboard from "./pages/recruiter/jobs/JobsDashboard";
 import CreateJob from "./pages/recruiter/CreateJob";
 import Pipeline from "./pages/recruiter/Pipeline";
 import AddNewCandidate from "./pages/recruiter/AddNewCandidate";
-import AddExistingCandidate from "./pages/recruiter/AddExistingCandidate";
 import Candidates from "./pages/recruiter/Candidates";
-import JobsDashboard from "./pages/recruiter/jobs/JobsDashboard";
-import InterviewerDashboard from "./pages/Interviewer/InterviewerDashboard";
+
 import InterviewDashboard from "./pages/recruiter/Interview/InterviewDashboard";
-import LandingPage from "./pages/LandingPage";
+import InterviewerDashboard from "./pages/Interviewer/InterviewerDashboard";
 import InterviewDetailPage from "./pages/Interviewer/InterviewerDetailPage";
+
 import CandidatePortal from "./pages/Candidate/CandidatePortal";
-import SetNewPassword from "./pages/SetNewPassword";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
   return (
     <BrowserRouter>
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 3000,
-          style: {
-            borderRadius: "10px",
-            background: "#fff",
-            color: "#1e293b",
-          },
-        }}
-      />
+      <Toaster position="top-right" />
+
       <Routes>
+
+        {/* PUBLIC */}
         <Route path="/login" element={<Login />} />
         <Route index element={<LandingPage />} />
+
         <Route
           path="/set-new-password"
           element={
@@ -46,6 +45,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* RECRUITER */}
         <Route
           path="/recruiter"
           element={
@@ -57,18 +58,15 @@ function App() {
           <Route index element={<RecruiterDashboard />} />
           <Route path="business-units" element={<BusinessUnits />} />
           <Route path="jobs" element={<JobsDashboard />} />
-          <Route path="/recruiter/jobs/create" element={<CreateJob />} />
+          <Route path="jobs/create" element={<CreateJob />} />
           <Route path="pipeline" element={<Pipeline />} />
           <Route path="pipeline/:jobId/add-new" element={<AddNewCandidate />} />
-          <Route path="/recruiter/candidates" element={<Candidates />} />
-          <Route
-            path="pipeline/:jobId/add-existing"
-            element={<AddExistingCandidate />}
-          />
+          <Route path="candidates" element={<Candidates />} />
           <Route path="interviews" element={<InterviewDashboard />} />
           <Route path="interviews/:jobId" element={<InterviewDashboard />} />
         </Route>
 
+        {/* INTERVIEWER */}
         <Route
           path="/interviewer"
           element={
@@ -87,15 +85,21 @@ function App() {
           }
         />
 
+        {/* ADMIN (NEW LAYOUT) */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute roles={["ADMIN"]}>
-              <AdminDashboard />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
+
+        {/* CANDIDATE PORTAL */}
         <Route path="/candidate-portal" element={<CandidatePortal />} />
+
       </Routes>
     </BrowserRouter>
   );
