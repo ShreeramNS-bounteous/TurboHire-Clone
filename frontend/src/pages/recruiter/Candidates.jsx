@@ -23,10 +23,7 @@ export default function Candidates() {
     });
   }, []);
 
-  const paginated = candidates.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
+  const paginated = candidates.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   // Load profile summaries for visible rows
   useEffect(() => {
@@ -65,7 +62,7 @@ export default function Candidates() {
   const totalPages = Math.ceil(candidates.length / PAGE_SIZE);
 
   return (
-    <div>
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <h1 className="text-2xl font-semibold mb-6">Candidates</h1>
 
       <div className="space-y-4">
@@ -80,25 +77,34 @@ export default function Candidates() {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
         <button
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
-          className="border px-3 py-1 rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-lg border 
+               hover:bg-gray-50 transition
+               disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Prev
+          ← Previous
         </button>
 
-        <span className="text-sm text-gray-500">
-          Page {page} of {totalPages}
-        </span>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span className="font-medium">Page</span>
+          <span className="px-3 py-1 bg-gray-100 rounded-full font-semibold">
+            {page}
+          </span>
+          <span>of</span>
+          <span className="font-semibold">{totalPages}</span>
+        </div>
 
         <button
           disabled={page === totalPages}
           onClick={() => setPage(page + 1)}
-          className="border px-3 py-1 rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-lg border 
+               hover:bg-gray-50 transition
+               disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Next
+          Next →
         </button>
       </div>
 

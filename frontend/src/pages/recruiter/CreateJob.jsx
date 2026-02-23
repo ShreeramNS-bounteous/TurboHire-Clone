@@ -86,9 +86,8 @@ export default function CreateJob() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow max-w-xl"
+        className="bg-white p-6 rounded-lg shadow-sm w-full max-w-3xl"
       >
-        {/* Job Title */}
         <input
           name="title"
           placeholder="Job Title"
@@ -97,7 +96,6 @@ export default function CreateJob() {
           className="w-full border p-2 rounded mb-4"
         />
 
-        {/* Business Unit */}
         <select
           name="buId"
           value={form.buId}
@@ -112,7 +110,6 @@ export default function CreateJob() {
           ))}
         </select>
 
-        {/* Location */}
         <input
           name="location"
           placeholder="Location"
@@ -121,8 +118,7 @@ export default function CreateJob() {
           className="w-full border p-2 rounded mb-4"
         />
 
-        {/* Experience */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <input
             type="number"
             name="experienceMin"
@@ -146,8 +142,7 @@ export default function CreateJob() {
           <p className="font-medium mb-2">Interview Rounds</p>
 
           {rounds.map((r, index) => (
-            <div key={index} className="flex gap-3 mb-3 items-center">
-              
+           <div key={index} className="flex flex-col sm:flex-row gap-3 mb-3">
               {/* Round Name */}
               <input
                 placeholder={`Round ${index + 1}`}

@@ -80,7 +80,7 @@ const fileToBase64 = (file) =>
     };
   
     return (
-      <div className="max-w-xl">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-3xl">
         <h1 className="text-2xl font-semibold mb-6">Add New Candidate</h1>
   
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow">
@@ -126,7 +126,7 @@ const fileToBase64 = (file) =>
             />
           </div>
   
-          <div className="flex gap-4 mt-6">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-3xl">
             <button
               type="submit"
               disabled={loading}
