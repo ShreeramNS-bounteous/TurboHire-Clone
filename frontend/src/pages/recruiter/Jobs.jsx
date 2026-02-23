@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getJobs,
-  publishJob,
-  closeJob,
-} from "../../api/jobs.api";
+import { getJobs, publishJob, closeJob } from "../../api/jobs.api";
 import { getBusinessUnits } from "../../api/businessUnits.api";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +8,7 @@ export default function Jobs() {
   const [jobs, setJobs] = useState([]);
   const [businessUnits, setBusinessUnits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   const loadData = async () => {
     try {
@@ -53,23 +50,39 @@ export default function Jobs() {
     return <p>Loading jobs...</p>;
   }
 
+  const filteredJobs = jobs.filter((job) => {
+    const query = search.toLowerCase();
+
+    return (
+      job.title?.toLowerCase().includes(query) ||
+      job.jobCode?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
-  
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-semibold">
-          Jobs
-        </h1>
-  
-        <button
-          onClick={() => navigate("/recruiter/jobs/create")}
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
-        >
-          + Create Job
-        </button>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold">Jobs</h1>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <input
+            type="text"
+            placeholder="Search by Job Code or Title..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border px-4 py-2 rounded-lg w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <button
+            onClick={() => navigate("/recruiter/jobs/create")}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            + Create Job
+          </button>
+        </div>
       </div>
-  
+
       {/* Table Wrapper */}
       <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
         <table className="min-w-[700px] w-full text-sm">
@@ -83,7 +96,7 @@ export default function Jobs() {
             </tr>
           </thead>
           <tbody>
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <tr key={job.id} className="border-b">
                 <td className="p-4 font-medium">{job.title}</td>
                 <td className="p-4">{getBuName(job)}</td>
@@ -109,8 +122,8 @@ export default function Jobs() {
                 </td>
               </tr>
             ))}
-  
-            {jobs.length === 0 && (
+
+            {filteredJobs.length === 0 && (
               <tr>
                 <td colSpan="5" className="p-4 text-gray-500">
                   No jobs found

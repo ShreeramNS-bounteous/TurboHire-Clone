@@ -62,17 +62,19 @@ export default function JobCard({
       </div>
 
       {/* COUNTS */}
-      <div className="flex justify-between px-10 py-6 text-center">
-        <CountItem label="Pool" value={counts.pool} />
-        <CountItem label="Shortlist" value={counts.shortlisted} />
+      <div className="px-6 sm:px-10 py-6">
+        <div className="flex flex-wrap sm:flex-nowrap justify-between gap-8 text-center">
+          <CountItem label="Pool" value={counts.pool} />
+          <CountItem label="Shortlist" value={counts.shortlisted} />
 
-        {counts.rounds.map((r) => (
-          <CountItem key={r.name} label={r.name} value={r.count} />
-        ))}
+          {counts.rounds.map((r) => (
+            <CountItem key={r.name} label={r.name} value={r.count} />
+          ))}
 
-        <CountItem label="Hired" value={counts.hired} />
-        <CountItem label="Offer" value={counts.offer} />
-        <CountItem label="Rejected" value={counts.rejected} />
+          <CountItem label="Hired" value={counts.hired} />
+          <CountItem label="Offer" value={counts.offer} />
+          <CountItem label="Rejected" value={counts.rejected} />
+        </div>
       </div>
 
       {/* Bottom Border */}
@@ -83,9 +85,13 @@ export default function JobCard({
 
 function CountItem({ label, value }) {
   return (
-    <div>
-      <div className="text-3xl font-semibold text-gray-800">{value}</div>
-      <div className="text-sm text-gray-500 mt-1">{label}</div>
+    <div className="min-w-[90px]">
+      <div className="text-3xl font-semibold text-gray-800">
+        {value}
+      </div>
+      <div className="text-sm text-gray-500 mt-1">
+        {label}
+      </div>
     </div>
   );
 }
