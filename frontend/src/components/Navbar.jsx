@@ -20,41 +20,51 @@ export default function Navbar() {
         : "text-gray-300 hover:text-white"
     }`;
 
-  const navLinks = (
-    <>
-      {/* Desktop Nav */}
-      <nav className="hidden md:flex items-center gap-6 ml-6">
-        <NavLink to="/recruiter/jobs" className={linkClass}>
-          Jobs
-        </NavLink>
-        <NavLink to="/recruiter/candidates" className={linkClass}>
-          Candidates
-        </NavLink>
-        <NavLink to="/recruiter/interviews" className={linkClass}>
-          Interview
-        </NavLink>
-      </nav>
+  /* =========================
+     LEFT SIDE (DESKTOP LINKS)
+     ========================= */
+  const leftContent = (
+    <nav className="hidden md:flex items-center gap-6 ml-6">
+      <NavLink to="/recruiter/jobs" className={linkClass}>
+        Jobs
+      </NavLink>
+
+      <NavLink to="/recruiter/candidates" className={linkClass}>
+        Candidates
+      </NavLink>
+
+      <NavLink to="/recruiter/interviews" className={linkClass}>
+        Interview
+      </NavLink>
+    </nav>
+  );
+
+  /* =========================
+     RIGHT SIDE
+     ========================= */
+  const rightContent = (
+    <div className="flex items-center gap-4">
+
+      {/* Desktop user info */}
+      <div className="hidden md:flex items-center gap-4">
+        <span className="text-gray-300 text-sm">
+          {user?.email}
+        </span>
+
+        <button
+          onClick={handleLogout}
+          className="text-gray-300 hover:text-red-400 transition text-sm"
+        >
+          Logout
+        </button>
+      </div>
 
       {/* Mobile Hamburger */}
       <button
-        className="md:hidden text-gray-300"
+        className="md:hidden text-gray-300 text-xl"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         ☰
-      </button>
-    </>
-  );
-
-  const rightContent = (
-    <div className="hidden md:flex items-center gap-4">
-      <span className="text-gray-300 text-sm">
-        {user?.email}
-      </span>
-      <button
-        onClick={handleLogout}
-        className="text-gray-300 hover:text-red-400 transition text-sm"
-      >
-        Logout
       </button>
     </div>
   );
@@ -62,13 +72,16 @@ export default function Navbar() {
   return (
     <>
       <BaseNavbar
-        leftContent={navLinks}
+        leftContent={leftContent}
         rightContent={rightContent}
       />
 
-      {/* Mobile Dropdown */}
+      {/* =========================
+         MOBILE DROPDOWN
+         ========================= */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#0f172a] px-6 py-4 space-y-3">
+        <div className="md:hidden bg-[#0f172a] px-6 py-4 space-y-4 border-t border-gray-700">
+
           <NavLink
             to="/recruiter/jobs"
             className={linkClass}
@@ -76,6 +89,7 @@ export default function Navbar() {
           >
             Jobs
           </NavLink>
+
           <NavLink
             to="/recruiter/candidates"
             className={linkClass}
@@ -83,6 +97,7 @@ export default function Navbar() {
           >
             Candidates
           </NavLink>
+
           <NavLink
             to="/recruiter/interviews"
             className={linkClass}
@@ -91,13 +106,14 @@ export default function Navbar() {
             Interview
           </NavLink>
 
-          <div className="border-t border-gray-700 pt-3 mt-3">
-            <div className="text-gray-400 text-xs">
+          <div className="border-t border-gray-700 pt-4 mt-4">
+            <div className="text-gray-400 text-xs mb-2">
               {user?.email}
             </div>
+
             <button
               onClick={handleLogout}
-              className="text-red-400 text-sm mt-2"
+              className="text-red-400 text-sm"
             >
               Logout
             </button>

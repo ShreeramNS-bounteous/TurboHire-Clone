@@ -26,12 +26,14 @@ export default function JobCard({
       onClick={() => navigate(`/recruiter/interviews/${job.id}`)}
     >
       {/* Header */}
-      <div className="flex justify-between p-6">
+      <div className="flex justify-between p-4 sm:p-6">
         <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold">{job.title}</h2>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="text-lg sm:text-xl font-semibold">
+              {job.title}
+            </h2>
 
-            {/* ✅ STATUS BADGE */}
+            {/* STATUS BADGE */}
             <span
               className={`text-xs font-semibold px-2 py-1 rounded ${
                 isClosed
@@ -43,27 +45,35 @@ export default function JobCard({
             </span>
           </div>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             BXA-{String(job.id).padStart(4, "0")}
           </p>
 
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-xs sm:text-sm text-gray-600 mt-2">
             {job.location} · {job.experienceMin}-{job.experienceMax} yrs
           </p>
         </div>
 
         {/* ACTIONS */}
-        <JobActionsMenu
-          jobId={job.id}
-          jobStatus={job.status}
-          onJobDeleted={onJobDeleted}
-          onJobClosed={onJobClosed}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <JobActionsMenu
+            jobId={job.id}
+            jobStatus={job.status}
+            onJobDeleted={onJobDeleted}
+            onJobClosed={onJobClosed}
+          />
+        </div>
       </div>
 
       {/* COUNTS */}
-      <div className="px-6 sm:px-10 py-6">
-        <div className="flex flex-wrap sm:flex-nowrap justify-between gap-8 text-center">
+      <div className="px-4 sm:px-10 py-4 sm:py-6">
+        <div
+          className="
+            grid grid-cols-2 gap-4
+            sm:flex sm:flex-nowrap sm:justify-between sm:gap-8
+            text-center
+          "
+        >
           <CountItem label="Pool" value={counts.pool} />
           <CountItem label="Shortlist" value={counts.shortlisted} />
 
@@ -85,11 +95,11 @@ export default function JobCard({
 
 function CountItem({ label, value }) {
   return (
-    <div className="min-w-[90px]">
-      <div className="text-3xl font-semibold text-gray-800">
+    <div className="min-w-0 sm:min-w-[90px]">
+      <div className="text-xl sm:text-3xl font-semibold text-gray-800">
         {value}
       </div>
-      <div className="text-sm text-gray-500 mt-1">
+      <div className="text-xs sm:text-sm text-gray-500 mt-1">
         {label}
       </div>
     </div>

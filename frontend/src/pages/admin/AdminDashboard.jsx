@@ -1,113 +1,78 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import {
-  getAdminDashboardSummary,
-  getJobAnalytics,
-  getHiringFunnelAnalytics,
-  getInterviewMetrics,
-  getTimeAnalytics,
-  getFilteredJobAnalytics
-} from "../../api/adminAnalyticsService";
-
-import AdminSummaryCards from "../../components/admin/AdminSummaryCards";
+import KPISection from "../../components/admin/KPISection";
 import HiringFunnelChart from "../../components/admin/HiringFunnelChart";
 import InterviewMetricsPanel from "../../components/admin/InterviewMetricsPanel";
-import TimeAnalyticsCharts from "../../components/admin/TimeAnalyticsChart";
-import AdminJobFilters from "../../components/admin/AdminJobFilters";
-import AdminJobTable from "../../components/admin/AdminJobTable";
+import TimeAnalyticsChart from "../../components/admin/TimeAnalyticsChart";
 
-const AdminDashboard = () => {
-  const [summary, setSummary] = useState(null);
-  const [jobs, setJobs] = useState([]);
-  const [funnel, setFunnel] = useState(null);
-  const [interviewMetrics, setInterviewMetrics] = useState(null);
-  const [trends, setTrends] = useState(null);
+import { getAdminDashboard } from "../../api/adminAnalyticsService";
 
-  const applyFilters = async (filters) => {
-    const data = await getFilteredJobAnalytics(filters);
-    setJobs(data);
-  };
-
-  const resetFilters = async () => {
-    const data = await getJobAnalytics();
-    setJobs(data);
-  };
-
-  const loadDashboard = async () => {
-    const [s, j, f, i, t] = await Promise.all([
-      getAdminDashboardSummary(),
-      getJobAnalytics(),
-      getHiringFunnelAnalytics(),
-      getInterviewMetrics(),
-      getTimeAnalytics()
-    ]);
-
-    setSummary(s);
-    setJobs(j);
-    setFunnel(f);
-    setInterviewMetrics(i);
-    setTrends(t);
-  };
+export default function AdminDashboard() {
+  const [dashboard, setDashboard] = useState(null);
 
   useEffect(() => {
-    loadDashboard();
+    getAdminDashboard()
+      .then((data) => {
+        console.log("DASHBOARD:", data);
+        setDashboard(data);
+      })
+      .catch((err) => console.error(err));
   }, []);
 
-  return (
-    <div className="space-y-6">
+  if (!dashboard) return <div className="p-6">Loading...</div>;
 
-      {/* Page title */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Dashboard Overview
-        </h1>
-        <p className="text-gray-500 text-sm">
-          Analytics and insights across the hiring pipeline
+  return (
+    <div className="space-y-8 p-6">
+      <KPISection
+        totalActiveJobs={dashboard.totalActiveJobs}
+        totalPipeline={dashboard.totalPipeline}
+        totalHired={dashboard.totalHired}
+        totalRejected={dashboard.totalRejected}
+      />
+
+      <div className="bg-white p-6 rounded-2xl shadow-md border border-indigo-100 mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-indigo-700">
+          Hiring Efficiency
+        </h3>
+
+        <div className="grid md:grid-cols-3 gap-6 text-center">
+          <div>
+            <p className="text-gray-500 text-sm">Overall Conversion</p>
+            <p className="text-2xl font-bold text-indigo-600">
+              {dashboard.overallConversionRate}%
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-500 text-sm">Shortlisted → Hired</p>
+            <p className="text-2xl font-bold text-indigo-600">
+              {dashboard.totalHired} / {dashboard.totalShortlisted}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-500 text-sm">Interviews per Hire</p>
+            <p className="text-2xl font-bold text-indigo-600">
+              {dashboard.interviewsPerHire}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <HiringFunnelChart funnel={dashboard.funnel} />
+        <InterviewMetricsPanel metrics={dashboard.interviewMetrics} />
+      </div>
+
+      {/* ✅ Add this below funnel section */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-yellow-200 mt-4">
+        <p className="text-sm font-semibold text-yellow-700">
+          ⏳ R1 Pending Scheduling: {dashboard.r1Pending}
         </p>
       </div>
 
-      {/* SUMMARY CARDS */}
-      <section className="bg-white p-5 rounded-xl shadow-sm border">
-        <AdminSummaryCards data={summary} />
-      </section>
-
-      {/* FUNNEL + INTERVIEW METRICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <section className="bg-white p-5 rounded-xl shadow-sm border">
-          <h2 className="font-semibold mb-3">Hiring Funnel</h2>
-          <HiringFunnelChart data={funnel} />
-        </section>
-
-        <section className="bg-white p-5 rounded-xl shadow-sm border">
-          <h2 className="font-semibold mb-3">Interview Metrics</h2>
-          <InterviewMetricsPanel data={interviewMetrics} />
-        </section>
-
-      </div>
-
-      {/* TIME ANALYTICS */}
-      <section className="bg-white p-5 rounded-xl shadow-sm border">
-        <h2 className="font-semibold mb-3">Time Trends</h2>
-        <TimeAnalyticsCharts data={trends} />
-      </section>
-
-      {/* JOB ANALYTICS TABLE */}
-      <section className="bg-white p-5 rounded-xl shadow-sm border">
-        <h2 className="font-semibold mb-4">Job Analytics</h2>
-
-        <AdminJobFilters
-          onApply={applyFilters}
-          onReset={resetFilters}
-        />
-
-        <div className="mt-4">
-          <AdminJobTable jobs={jobs} />
-        </div>
-      </section>
-
+      <TimeAnalyticsChart analytics={dashboard.timeAnalytics} />
     </div>
   );
-};
-
-export default AdminDashboard;
+}
