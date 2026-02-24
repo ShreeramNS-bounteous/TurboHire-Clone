@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
 });
 
 api.interceptors.request.use(
@@ -10,8 +10,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("AUTH HEADER:", config.headers.Authorization);
-    return config;
+    return config; // removed AUTH HEADER log
   },
   (error) => Promise.reject(error)
 );

@@ -34,7 +34,10 @@ export default function AdminUsers() {
     await createUser(formData);
     setShowModal(false);
     loadData();
-  };
+    };
+    
+   
+    console.log(users);
 
   return (
     <div className="p-8 space-y-6">

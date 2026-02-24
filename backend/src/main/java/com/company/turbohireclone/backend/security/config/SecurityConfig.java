@@ -32,9 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
-                                "/api/auth/**",
-                                "/api/candidate-portal/**",
-                                "/test-email"
+                                "/api/candidate-portal/**"
                         )
                         .permitAll()
                         .anyRequest().authenticated()
