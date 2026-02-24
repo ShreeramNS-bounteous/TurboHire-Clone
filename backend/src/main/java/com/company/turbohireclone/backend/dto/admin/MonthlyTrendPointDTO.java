@@ -1,4 +1,4 @@
-package com.company.turbohireclone.backend.dto;
+package com.company.turbohireclone.backend.dto.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

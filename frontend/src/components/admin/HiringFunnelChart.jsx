@@ -47,7 +47,7 @@ export default function HiringFunnelChart({ funnel }) {
             dataKey="name"
             tick={{ fill: "#6b7280", fontSize: 12 }}
             interval={0}
-            angle={-15}
+            
             textAnchor="end"
           />
 

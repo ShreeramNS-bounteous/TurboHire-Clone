@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Eye, EyeOff, Activity, BarChart3, PieChart } from "lucide-react";
 import { loginApi } from "../api/auth.api";
 import { useAuth } from "../auth/AuthContext";
@@ -14,33 +14,48 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === "ADMIN")
+        navigate("/admin", { replace: true });
+  
+      else if (user.role === "RECRUITER")
+        navigate("/recruiter/jobs", { replace: true });
+  
+      else if (user.role === "USER")
+        navigate("/interviewer", { replace: true });
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
+
     try {
       setLoading(true);
-  
+
       const response = await loginApi(email, password);
-  
+
       const { accessToken, passwordTemporary } = response;
-  
+
       login(accessToken);
-  
+
       // 🚨 If temporary password → force change
       if (passwordTemporary) {
-        navigate("/set-new-password");
+        navigate("/set-new-password", { replace: true });
         return;
       }
-  
+
       const payload = JSON.parse(atob(accessToken.split(".")[1]));
       const role = payload.role;
-  
-      if (role === "ADMIN") navigate("/admin");
-      else if (role === "RECRUITER") navigate("/recruiter/jobs");
-      else if (role === "USER") navigate("/interviewer");
-      else navigate("/login");
-  
+
+      if (role === "ADMIN") navigate("/admin", { replace: true });
+      else if (role === "RECRUITER")
+        navigate("/recruiter/jobs", { replace: true });
+      else if (role === "USER") navigate("/interviewer", { replace: true });
+      else navigate("/login", { replace: true });
     } catch (err) {
       setError("Invalid email or password");
     } finally {
@@ -54,15 +69,15 @@ const LoginPage = () => {
         {/* LEFT SECTION */}
         <div className="hidden lg:flex lg:w-1/2 p-12 flex-col text-white">
           <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-black rounded-md flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-all">
-            <div className="absolute inset-0 bg-gray-900 group-hover:bg-black transition-colors"></div>
-            <span className="relative z-10 text-[#008AFF] font-bold text-xl mr-[1px]">
-              T
-            </span>
-            <span className="relative z-10 text-white font-bold text-xl">
-              H
-            </span>
-          </div>
+            <div className="w-10 h-10 bg-black rounded-md flex items-center justify-center relative overflow-hidden shadow-sm group-hover:shadow-md transition-all">
+              <div className="absolute inset-0 bg-gray-900 group-hover:bg-black transition-colors"></div>
+              <span className="relative z-10 text-[#008AFF] font-bold text-xl mr-[1px]">
+                T
+              </span>
+              <span className="relative z-10 text-white font-bold text-xl">
+                H
+              </span>
+            </div>
             <span className="text-2xl font-bold">TurboHire</span>
           </div>
 

@@ -43,7 +43,7 @@ export default function InterviewerNavbar() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl text-[#101828]">
+        <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl text-[#101828] z-50">
           <div className="px-4 py-3 border-b">
             <p className="text-sm font-bold truncate">{email}</p>
           </div>
