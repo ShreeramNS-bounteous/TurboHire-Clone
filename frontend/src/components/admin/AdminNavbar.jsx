@@ -1,25 +1,43 @@
+import { Menu } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const AdminNavbar = () => {
-  const { user } = useAuth();
+const AdminNavbar = ({ setMobileOpen }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
-    <header className="bg-white border-b px-6 py-3 flex justify-between items-center">
+    <header className="bg-[#101828] border-b border-gray-700 px-6 py-4 flex justify-between items-center text-white">
 
-      <h1 className="text-lg font-semibold">
+      {/* Mobile Hamburger */}
+      <button
+        className="md:hidden"
+        onClick={() => setMobileOpen(true)}
+      >
+        <Menu size={22} />
+      </button>
+
+      <h1 className="text-lg font-semibold hidden md:block">
         Admin Dashboard
       </h1>
 
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-300">
           {user?.email}
         </span>
 
-        <button className="px-3 py-1 bg-gray-900 text-white rounded-lg">
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1 bg-gray-900 hover:bg-red-600 rounded-lg text-sm transition"
+        >
           Logout
         </button>
       </div>
-
     </header>
   );
 };

@@ -1,16 +1,10 @@
 package com.company.turbohireclone.backend.services;
 
-import com.company.turbohireclone.backend.dto.*;
-
-import java.time.LocalDate;
-import java.util.List;
+import com.company.turbohireclone.backend.dto.admin.*;
 
 public interface AdminAnalyticsService {
-    AdminDashboardSummaryDTO getAdminDashboardSummary();
 
-    List<JobAnalyticsDTO> getJobAnalytics();
-
-    List<JobAnalyticsDTO> getJobAnalytics(JobAnalyticsFilterDTO filter);
+    AdminDashboardResponse getFullDashboard();
 
     HiringFunnelDTO getHiringFunnel();
 

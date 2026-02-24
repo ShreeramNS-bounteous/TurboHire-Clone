@@ -19,5 +19,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
 
     List<Job> findByBusinessUnit_IdAndStatus(Long buId, String status);
 
-    long countByStatus(String status);
+
+
+    long countByStatusNot(String status);
 }

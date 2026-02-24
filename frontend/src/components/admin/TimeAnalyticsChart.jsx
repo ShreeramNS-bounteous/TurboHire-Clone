@@ -1,6 +1,6 @@
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
@@ -58,33 +58,31 @@ export default function TimeAnalyticsChart({ analytics }) {
       </h3>
 
       <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={mergedData}>
+        <BarChart data={mergedData}>
           <XAxis dataKey="month" />
           <YAxis />
           <Tooltip />
           <Legend />
 
-          <Line
-            type="monotone"
+          <Bar
             dataKey="candidates"
-            stroke="#6366f1"
-            strokeWidth={3}
+            fill="#6366f1"
+            radius={[6, 6, 0, 0]}
           />
 
-          <Line
-            type="monotone"
+          <Bar
             dataKey="interviews"
-            stroke="#f59e0b"
-            strokeWidth={3}
+            fill="#f59e0b"
+            radius={[6, 6, 0, 0]}
           />
 
-          <Line
-            type="monotone"
+          <Bar
             dataKey="hires"
-            stroke="#10b981"
-            strokeWidth={3}
+            fill="#10b981"
+            radius={[6, 6, 0, 0]}
           />
-        </LineChart>
+
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

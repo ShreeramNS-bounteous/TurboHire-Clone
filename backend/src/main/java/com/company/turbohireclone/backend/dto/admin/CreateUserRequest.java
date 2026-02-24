@@ -7,6 +7,7 @@ public class CreateUserRequest {
 
     private String fullName;
     private String email;
-    private String password;
-    private Long businessUnitId; //error
+    private String password;     // Required only for USER
+    private String roleName;     // USER or RECRUITER
+    private Long businessUnitId;
 }

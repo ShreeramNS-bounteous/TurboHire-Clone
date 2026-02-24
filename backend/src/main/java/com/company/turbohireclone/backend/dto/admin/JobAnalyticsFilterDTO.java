@@ -1,4 +1,4 @@
-package com.company.turbohireclone.backend.dto;
+package com.company.turbohireclone.backend.dto.admin;
 
 import lombok.Data;
 import java.time.LocalDate;

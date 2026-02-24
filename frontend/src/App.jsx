@@ -9,6 +9,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 
 import RecruiterLayout from "./layout/RecruiterLayout";
 import AdminLayout from "./layout/AdminLayout";
+import AdminUsers from "./components/admin/AdminUsers";
 
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import BusinessUnits from "./pages/recruiter/BusinessUnits";
@@ -32,7 +33,6 @@ function App() {
       <Toaster position="top-right" />
 
       <Routes>
-
         {/* PUBLIC */}
         <Route path="/login" element={<Login />} />
         <Route index element={<LandingPage />} />
@@ -85,7 +85,6 @@ function App() {
           }
         />
 
-        {/* ADMIN (NEW LAYOUT) */}
         <Route
           path="/admin"
           element={
@@ -95,11 +94,12 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
-        </Route>
 
+          {/* ✅ ADD THIS */}
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
         {/* CANDIDATE PORTAL */}
         <Route path="/candidate-portal" element={<CandidatePortal />} />
-
       </Routes>
     </BrowserRouter>
   );

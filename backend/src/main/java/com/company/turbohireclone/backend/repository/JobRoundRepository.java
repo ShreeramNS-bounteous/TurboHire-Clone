@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.company.turbohireclone.backend.entity.JobRound;
@@ -16,6 +17,8 @@ public interface JobRoundRepository extends JpaRepository<JobRound, Long> {
 
     // ✅ REQUIRED for pipeline & interview flow
     List<JobRound> findByJob_IdOrderByRoundOrderAsc(Long jobId);
+
+    List<JobRound> findAllByOrderByRoundOrderAsc();
 
     // ✅ Used when creating interview
     Optional<JobRound> findFirstByJob_IdOrderByRoundOrderAsc(Long jobId);

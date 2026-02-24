@@ -3,6 +3,7 @@ package com.company.turbohireclone.backend.repository;
 import com.company.turbohireclone.backend.entity.Interview;
 import com.company.turbohireclone.backend.entity.CandidateJob;
 import com.company.turbohireclone.backend.entity.JobRound;
+import com.company.turbohireclone.backend.enums.AttendanceStatus;
 import com.company.turbohireclone.backend.enums.InterviewStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,35 +29,46 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
             List<InterviewStatus> statuses
     );
 
-
-    Optional<JobRound> findFirstByCandidateJob_Job_IdOrderByRound_RoundOrderAsc(Long jobId);
-
     List<Interview> findByStatus(InterviewStatus status);
 
-    long countByStatus(String status);
+    long countByStatus(InterviewStatus status);
 
-    long countByCandidateJob_Job_Id(Long jobId);
+    long countByAttendanceStatus(AttendanceStatus attendanceStatus);
 
     @Query("""
-SELECT to_char(i.scheduledAt, 'YYYY-MM') as month, count(i)
+SELECT r.roundOrder, r.roundName, COUNT(i)
 FROM Interview i
-GROUP BY month
-ORDER BY month
+JOIN i.round r
+GROUP BY r.roundOrder, r.roundName
+ORDER BY r.roundOrder
 """)
+    List<Object[]> countInterviewsByRoundOrder();
+
+
+
+    @Query("""
+        SELECT 
+            YEAR(i.scheduledAt),
+            MONTH(i.scheduledAt),
+            COUNT(i)
+        FROM Interview i
+        WHERE i.scheduledAt IS NOT NULL
+        GROUP BY YEAR(i.scheduledAt), MONTH(i.scheduledAt)
+        ORDER BY YEAR(i.scheduledAt), MONTH(i.scheduledAt)
+    """)
     List<Object[]> interviewsPerMonth();
 
+    @Query("""
+SELECT COUNT(c)
+FROM CandidateJob c
+WHERE c.status = 'IN_PROGRESS'
+AND c.currentStage = 'SHORTLISTED'
+AND NOT EXISTS (
+    SELECT i FROM Interview i
+    WHERE i.candidateJob = c
+    AND i.round.roundOrder = 1
+)
+""")
+    long countR1Pending();
 
-//    @Query("""
-//        SELECT i
-//        FROM Interview i
-//        JOIN InterviewAssignment ia ON ia.interview = i
-//        WHERE ia.interviewer.id = :interviewerId
-//          AND NOT EXISTS (
-//              SELECT 1
-//              FROM InterviewFeedback f
-//              WHERE f.interview = i
-//                AND f.interviewer.id = :interviewerId
-//          )
-//    """)
-//    List<Interview> findPendingFeedbackInterviews(Long interviewerId);
 }
