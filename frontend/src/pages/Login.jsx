@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { Eye, EyeOff, Activity, BarChart3, PieChart } from "lucide-react";
 import { loginApi } from "../api/auth.api";
 import { useAuth } from "../auth/AuthContext";
@@ -14,48 +14,35 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      if (user.role === "ADMIN")
-        navigate("/admin", { replace: true });
-  
-      else if (user.role === "RECRUITER")
-        navigate("/recruiter/jobs", { replace: true });
-  
-      else if (user.role === "USER")
-        navigate("/interviewer", { replace: true });
-    }
-  }, [user, navigate]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       setLoading(true);
-
+  
       const response = await loginApi(email, password);
-
       const { accessToken, passwordTemporary } = response;
-
+  
       login(accessToken);
-
-      // 🚨 If temporary password → force change
+  
+      const decoded = JSON.parse(atob(accessToken.split(".")[1]));
+  
+      // 🚨 Temporary password
       if (passwordTemporary) {
-        navigate("/set-new-password", { replace: true });
+        window.location.replace("/set-new-password");
         return;
       }
-
-      const payload = JSON.parse(atob(accessToken.split(".")[1]));
-      const role = payload.role;
-
-      if (role === "ADMIN") navigate("/admin", { replace: true });
-      else if (role === "RECRUITER")
-        navigate("/recruiter/jobs", { replace: true });
-      else if (role === "USER") navigate("/interviewer", { replace: true });
-      else navigate("/login", { replace: true });
+  
+      if (decoded.role === "ADMIN")
+        window.location.replace("/admin");
+      else if (decoded.role === "RECRUITER")
+        window.location.replace("/recruiter/jobs");
+      else if (decoded.role === "USER")
+        window.location.replace("/interviewer");
+      else
+        window.location.replace("/login");
+  
     } catch (err) {
       setError("Invalid email or password");
     } finally {
