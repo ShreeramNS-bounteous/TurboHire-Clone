@@ -921,3 +921,131 @@
     justify-content: flex-start;
   }
 }
+
+@media (max-width: 768px) {
+
+  .interview-page {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  /* Layout stacking */
+  .interview-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .interview-content {
+    width: 100%;
+  }
+
+  /* Interviewer grid becomes single column */
+  .interviewer-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Tabs – NO SCROLL, JUST SMALLER */
+  .tabs {
+    width: 100%;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .tab {
+    flex: 1;
+    font-size: 12px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+
+  /* Pending Cards stack vertically */
+  .pending-card-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .pending-left,
+  .pending-middle,
+  .pending-right {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .pending-right {
+    justify-content: flex-start;
+  }
+
+  .schedule-btn {
+    width: 100%;
+  }
+
+  /* Scheduled Cards stack properly */
+  .scheduled-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .scheduled-left,
+  .scheduled-center,
+  .scheduled-right {
+    flex: unset;
+    width: 100%;
+  }
+
+  .scheduled-center {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .scheduled-right {
+    justify-content: flex-start;
+    margin-top: 12px;
+  }
+
+  .join-btn {
+    width: 100%;
+  }
+
+  /* Decision panel */
+  .decision-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Modal responsive */
+  .modal {
+    width: 90%;
+    padding: 18px;
+  }
+
+  /* Fix sliding container on phone */
+  .pending-switch {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pending-view,
+  .availability-view {
+    width: 100%;
+    padding-right: 0;
+  }
+
+}

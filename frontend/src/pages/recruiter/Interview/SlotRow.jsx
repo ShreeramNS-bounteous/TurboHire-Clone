@@ -8,7 +8,7 @@ export default function SlotRow({ slot, onBook }) {
       <button
         className="book-btn"
         onClick={() => onBook(slot.slotId)}
-        disabled={!slot.slotStatus == 'AVAILABLE'}
+        disabled={slot.slotStatus !== 'AVAILABLE'}
       >
         {slot.slotStatus == 'AVAILABLE'?'Book':'Booked'}
       </button>

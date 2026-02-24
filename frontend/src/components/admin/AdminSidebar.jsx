@@ -30,23 +30,6 @@ const AdminSidebar = () => {
         Users
       </NavLink>
 
-      <NavLink
-        to="/admin/jobs"
-        className={({ isActive }) =>
-          `${linkStyle} ${isActive ? activeStyle : ""}`
-        }
-      >
-        Job Analytics
-      </NavLink>
-
-      <NavLink
-        to="/admin/interviews"
-        className={({ isActive }) =>
-          `${linkStyle} ${isActive ? activeStyle : ""}`
-        }
-      >
-        Interview Metrics
-      </NavLink>
 
     </aside>
   );
