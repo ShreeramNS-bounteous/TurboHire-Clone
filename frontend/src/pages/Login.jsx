@@ -3,6 +3,7 @@ import { Eye, EyeOff, Activity, BarChart3, PieChart } from "lucide-react";
 import { loginApi } from "../api/auth.api";
 import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -26,22 +27,22 @@ const LoginPage = () => {
   
       login(accessToken);
   
-      const decoded = JSON.parse(atob(accessToken.split(".")[1]));
+      const decoded = jwtDecode(accessToken);
   
       // 🚨 Temporary password
       if (passwordTemporary) {
-        window.location.replace("/set-new-password");
+        navigate("/set-new-password");
         return;
       }
   
       if (decoded.role === "ADMIN")
-        window.location.replace("/admin");
+        navigate("/admin");
       else if (decoded.role === "RECRUITER")
-        window.location.replace("/recruiter/jobs");
+        navigate("/recruiter/jobs");
       else if (decoded.role === "USER")
-        window.location.replace("/interviewer");
+        navigate("/interviewer");
       else
-        window.location.replace("/login");
+        navigate("/login");
   
     } catch (err) {
       setError("Invalid email or password");

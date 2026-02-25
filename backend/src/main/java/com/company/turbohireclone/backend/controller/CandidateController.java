@@ -1,7 +1,6 @@
 package com.company.turbohireclone.backend.controller;
 
 import com.company.turbohireclone.backend.dto.candidate.*;
-import com.company.turbohireclone.backend.dto.candidate.*;
 import com.company.turbohireclone.backend.entity.Candidate;
 import com.company.turbohireclone.backend.entity.CandidateProfile;
 import com.company.turbohireclone.backend.entity.Resume;
