@@ -5,6 +5,7 @@ import com.company.turbohireclone.backend.dto.candidate.*;
 import com.company.turbohireclone.backend.entity.Candidate;
 import com.company.turbohireclone.backend.entity.CandidateProfile;
 import com.company.turbohireclone.backend.entity.Resume;
+import com.company.turbohireclone.backend.repository.CandidateRepository;
 import com.company.turbohireclone.backend.repository.UserRepository;
 import com.company.turbohireclone.backend.security.util.SecurityUtils;
 import com.company.turbohireclone.backend.services.CandidateService;
@@ -24,6 +25,7 @@ public class CandidateController {
 
     private final CandidateService candidateService;
     private final UserRepository userRepository;
+    private final CandidateRepository candidateRepository;
 
     /**
      * CREATE candidate
@@ -39,11 +41,8 @@ public class CandidateController {
 
 
 
-        if(userRepository.existsByEmail(req.getEmail())){
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Employee with email already exists"
-            );
+        if (candidateRepository.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("Candidate with this email already exists");
         }
 
         Candidate candidate = Candidate.builder()
@@ -124,6 +123,7 @@ public class CandidateController {
         return candidateService.getResume(candidateId);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','RECRUITER')")
     @GetMapping("/available/{jobId}")
     public ResponseEntity<List<CandidateSimpleDto>> getAvailableCandidates(
             @PathVariable Long jobId

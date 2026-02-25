@@ -117,6 +117,7 @@ public class InterviewController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUITER')")
     @GetMapping("/to-be-scheduled")
     public ResponseEntity<List<PendingInterviewDto>> getToBeScheduled(
             @RequestParam(required = false) Long jobId

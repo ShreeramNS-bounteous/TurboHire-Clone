@@ -26,4 +26,6 @@ public interface CandidateRepository extends JpaRepository<Candidate,Long> {
         )
 """)
     List<Candidate> findAvailableCandidatesForJob(@Param("jobId") Long jobId);
+
+    boolean existsByEmail(String email);
 }
