@@ -42,6 +42,9 @@ public class AuthService {
         // 3️⃣ Fetch full user from DB to get passwordTemporary flag
         User user = userRepository.findById(authUser.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new RuntimeException("User account not active");
+        }
 
         // 4️⃣ Return both token + flag
         return new LoginResponse(

@@ -61,6 +61,7 @@ public class OfferService {
                 .ifPresent(lock -> {
                     lock.setLockStatus(CandidateLockStatus.RELEASED);
                     lock.setReleasedAt(LocalDateTime.now());
+                    candidateLockRepository.save(lock);
                 });
 
         // ✅ AUDIT (MANDATORY)
