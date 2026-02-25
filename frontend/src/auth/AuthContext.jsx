@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       const currentTime = Date.now() / 1000;
 
       // token expired
-      if (decoded.exp < currentTime) {
+     if (!decoded.exp || decoded.exp < currentTime) {
         logout();
         return;
       }
