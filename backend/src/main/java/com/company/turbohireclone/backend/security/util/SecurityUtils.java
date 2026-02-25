@@ -8,9 +8,20 @@ public final class SecurityUtils {
     private SecurityUtils() {}
 
     public static Long getCurrentUserId() {
-        return ((AuthUser) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal()).getUserId();
+
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = auth.getPrincipal();
+
+        if (!(principal instanceof AuthUser)) {
+            return null;
+        }
+
+        return ((AuthUser) principal).getUserId();
     }
 
     public static String getCurrentUserRole() {

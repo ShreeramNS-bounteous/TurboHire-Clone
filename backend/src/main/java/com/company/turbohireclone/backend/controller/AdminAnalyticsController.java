@@ -1,6 +1,6 @@
 package com.company.turbohireclone.backend.controller;
 
-import com.company.turbohireclone.backend.dto.admin.AdminDashboardResponse;
+import  com.company.turbohireclone.backend.dto.admin.AdminDashboardResponse;
 import com.company.turbohireclone.backend.services.AdminAnalyticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
