@@ -16,16 +16,17 @@ public class CandidatePortalController {
 
     @GetMapping
     public CandidatePortalResponse getPortal(
-            @RequestParam String token
+            @RequestHeader("X-Portal-Token") String token
     ) {
         return portalService.getPortalByToken(token);
     }
 
     @PostMapping("/profile")
     public CandidateProfileResponse updateProfileByToken(
-            @RequestParam String token,
+            @RequestHeader("X-Portal-Token") String token,
             @RequestBody CandidateProfileUpdateRequest request
     ) {
         return portalService.updateProfile(token, request);
     }
+
 }

@@ -20,8 +20,8 @@ export default function UsersTable({ users }) {
               <tr key={user.id} className="border-t hover:bg-gray-50">
                 <td className="p-4">{user.fullName}</td>
                 <td className="p-4">{user.email}</td>
-                <td className="p-4">{user.role?.name}</td>
-                <td className="p-4">{user.businessUnit?.name}</td>
+                <td className="p-4">{user.roleName}</td>
+                <td className="p-4">{user.businessUnitName}</td>
                 <td className="p-4">
                   <span className="px-2 py-1 rounded-lg bg-green-100 text-green-700">
                     {user.status}

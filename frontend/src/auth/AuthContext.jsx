@@ -7,12 +7,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔐 Decode & validate token
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    setUser(null);
+  };
+
   const setUserFromToken = (token) => {
     try {
       const decoded = jwtDecode(token);
 
-      // 🚨 Check expiration
       const currentTime = Date.now() / 1000;
 
       if (decoded.exp < currentTime) {
@@ -36,12 +39,6 @@ export const AuthProvider = ({ children }) => {
     setUserFromToken(token);
   };
 
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    setUser(null);
-  };
-
-  // 🔄 On app start
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
