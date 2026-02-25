@@ -17,9 +17,10 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider(
             @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.jwt.expiration}") long jwtExpiryMs
+            @Value("${app.jwt.expiry-ms}") long jwtExpiryMs
     ) {
-        this.signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        this.signingKey =
+                Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         this.jwtExpiryMs = jwtExpiryMs;
     }
 
@@ -37,14 +38,17 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(signingKey)
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }
+    }
+    // nothing new
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(signingKey).build()
+                .parseClaimsJws(token).getBody();
     }
 
     public Long getUserId(String token) {
@@ -61,13 +65,5 @@ public class JwtTokenProvider {
 
     public Long getBuId(String token) {
         return ((Number) getClaims(token).get("buId")).longValue();
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(signingKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
     }
 }

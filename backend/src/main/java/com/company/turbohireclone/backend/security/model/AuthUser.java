@@ -21,7 +21,10 @@ public class AuthUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+        String normalized = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
+        return List.of(new SimpleGrantedAuthority(normalized));
     }
 
     @Override
